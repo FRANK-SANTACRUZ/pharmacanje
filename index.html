@@ -66,9 +66,10 @@
 <div id="root"></div>
 
 <script>
-    // ==================== DATOS COMPLETOS ====================
+    // ==================== BOTICAS ====================
     const BOTICAS = ["UNION", "LIBERTAD POMALCA", "VILLARREAL", "INCAS", "FORTALEZA POMALCA", "LAMBAYEQUE 2", "P.C", "LIBERTAD - LA VICTORIA", "LAMBAYEQUE 3", "LAMBAYEQUE 1"];
     
+    // ==================== DATOS COMPLETOS (Puedes agregar más productos aquí) ====================
     let productos = [
         { id: "p1", nombre: "HEMORRANE POMADA", cantidad: 1, precio: 28.90, fechaVenc: "2026-08-01", lote: "3140", laboratorio: "FAES FARMA", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-638278", obs: "" },
         { id: "p2", nombre: "amoxicilina", cantidad: 3, precio: 12.00, fechaVenc: "2026-09-12", lote: "00012", laboratorio: "portugal", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "F001-1214", obs: "" },
@@ -81,6 +82,7 @@
         { id: "p9", nombre: "MULTIFLORA ADVANCE", cantidad: 30, precio: 55.00, fechaVenc: "2026-10-01", lote: "137106", laboratorio: "MEGALABS", local: "INCAS", canje: "JUNIO", proveedor: "DIFARLIB", factura: "F002-197057", obs: "" }
     ];
     
+    // Agregar productos de ejemplo para todas las boticas que falten
     BOTICAS.forEach(b => {
         if(!productos.some(p => p.local === b)) {
             productos.push({ id: `gen_${b}`, nombre: "Producto Ejemplo", cantidad: 5, precio: 10.00, fechaVenc: "2026-12-01", lote: "L001", laboratorio: "LABGEN", local: b, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
@@ -121,8 +123,6 @@
         mensajes = storedMensajes ? JSON.parse(storedMensajes) : [];
         const storedNotificaciones = localStorage.getItem("pharma_notificaciones");
         notificaciones = storedNotificaciones ? JSON.parse(storedNotificaciones) : [];
-        if(mensajes.length === 0) localStorage.setItem("pharma_mensajes", JSON.stringify([]));
-        if(notificaciones.length === 0) localStorage.setItem("pharma_notificaciones", JSON.stringify([]));
     }
     
     function mostrarToast(mensaje) {
@@ -258,14 +258,14 @@
             <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
             <div style="overflow-x:auto; margin-top:12px;"><table><thead><tr><th>Producto</th><th>Cant</th><th>Precio</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></tr></thead><tbody>
             ${productosLocal.map(p => `<tr>
-                <td>${p.nombre.substring(0,40)}</td>
-                <td>${p.cantidad}</td>
-                <td>S/ ${(p.precio||0).toFixed(2)}</td>
-                <td>${p.fechaVenc}</td>
-                <td>${p.lote}</td>
-                <td>${p.laboratorio}</td>
-                <td>${p.canje === "JUNIO" ? '<span class="badge-junio">JUNIO</span>' : p.canje}</td>
-                <td><button class="btn-primary btn-sm" onclick="editarProducto('${p.id}')">Editar</button> <button class="btn-danger btn-sm" onclick="eliminarProducto('${p.id}')">Elim</button></td>
+                <td>${p.nombre.substring(0,40)}</td
+                <td>${p.cantidad}</td
+                <td>S/ ${(p.precio||0).toFixed(2)}</td
+                <td>${p.fechaVenc}</td
+                <td>${p.lote}</td
+                <td>${p.laboratorio}</td
+                <td>${p.canje === "JUNIO" ? '<span class="badge-junio">JUNIO</span>' : p.canje}</td
+                <td><button class="btn-primary btn-sm" onclick="editarProducto('${p.id}')">Editar</button> <button class="btn-danger btn-sm" onclick="eliminarProducto('${p.id}')">Elim</button></td
             </tr>`).join('')}
             </tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
@@ -280,7 +280,7 @@
                 <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="BONIFICACION">BONIFICACION</option></select>
                 <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
             </div>
-            <div style="overflow-x:auto; max-height:450px;"><table><thead><tr><th>Local</th><th>Producto</th><th>Cant</th><th>Precio</th><th>Laboratorio</th><th>Canje</th></tr></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
+            <div style="overflow-x:auto; max-height:450px;"><table><thead><tr><th>Local</th><th>Producto</th><th>Cant</th><th>Precio</th><th>Laboratorio</th><th>Canje</th></table></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         filtrarVBTabla();
         document.getElementById("filtroLocalVB")?.addEventListener("change", filtrarVBTabla);
@@ -300,11 +300,11 @@
         const tbody = document.getElementById("tablaVBBody");
         if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
             <td><strong>${p.local}</strong></td>
-            <td>${p.nombre.substring(0,45)}</td>
-            <td>${p.cantidad}</td>
-            <td>S/ ${(p.precio||0).toFixed(2)}</td>
-            <td>${p.laboratorio}</td>
-            <td>${p.canje}</td>
+            <td>${p.nombre.substring(0,45)}</td
+            <td>${p.cantidad}</td
+            <td>S/ ${(p.precio||0).toFixed(2)}</td
+            <td>${p.laboratorio}</td
+            <td>${p.canje}</td
         </tr>`).join('');
     }
     
@@ -323,43 +323,82 @@
         const miLocal = currentUser.boticaAsignada;
         const filtrados = productos.filter(p => p.local === miLocal && p.canje === mes);
         const html = `<table><thead><tr><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></tr></thead><tbody>
-            ${filtrados.map(p => `<tr><td>${p.nombre}</td><td>${p.cantidad}</td><td>${p.laboratorio}</td><td>${p.proveedor || '-'}</td><td>${p.factura || '-'}</td></tr>`).join('') || '<tr><td colspan="5">No hay productos para este mes</td></tr>'}
+            ${filtrados.map(p => `<tr>
+                <td>${p.nombre}</td
+                <td>${p.cantidad}</td
+                <td>${p.laboratorio}</td
+                <td>${p.proveedor || '-'}</td
+                <td>${p.factura || '-'}</td
+            </tr>`).join('') || '<tr><td colspan="5">No hay productos para este mes</td</tr>'}
         </tbody></table>`;
         document.getElementById("tablaCanjesMes").innerHTML = html;
     };
     
     function renderPoliticas() {
-        const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "IQ FARMA": "Canje con autorización.", "ELIFARMA": "Coordinar con representante.", "TECNOFARMA": "Canje automático +60 días.", "LANSIER": "Últimos 3 meses.", "BAYER": "Máximo 30 días.", "default": "Consultar con proveedor." };
+        const politicas = { 
+            "ITALFARMACO": "Canje hasta 60 días antes del vencimiento.", 
+            "FAES FARMA": "Canje con 90 días de anticipación.", 
+            "MEGALABS": "45 días antes del vencimiento.", 
+            "IQ FARMA": "Canje exclusivo con autorización previa.", 
+            "ELIFARMA": "Coordinar con el representante.", 
+            "TECNOFARMA": "Canje automático +60 días.", 
+            "LANSIER": "Solo productos últimos 3 meses.", 
+            "BAYER": "Máximo 30 días antes del vencimiento.",
+            "default": "Consultar con el proveedor." 
+        };
         const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br><span style="font-size:0.75rem;">${pol}</span></div>`).join('')}</div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
+    // ==================== VERIFICACIÓN CORREGIDA ====================
     function renderVerificar() {
         if(currentUser.rol !== "admin" && currentUser.rol !== "supervisor") { renderDashboard(); return; }
-        const puedeEditarTodo = currentUser.rol === "admin";
+        
         const html = `
             <div class="card"><h3>✅ Verificación de Productos</h3>
-            <div class="filtros"><input type="text" id="buscarVerif" placeholder="Buscar producto..."></div>
-            <div style="overflow-x:auto; max-height:500px;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th></th></thead><tbody id="verifBody"></tbody></table></div></div>`;
+            <div class="filtros">
+                <input type="text" id="buscarVerif" placeholder="Buscar producto...">
+                <select id="filtroLocalVerif"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
+            </div>
+            <div style="overflow-x:auto; max-height:500px;">
+                <table style="width:100%; min-width:800px;">
+                    <thead>
+                        <tr><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody id="verifBody"></tbody>
+                </table>
+            </div>
+            <div style="margin-top:15px; text-align:right;">
+                <button class="btn-primary" onclick="exportarVerificacion()"><i class="fas fa-file-excel"></i> Exportar verificación</button>
+            </div>
+            </div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         cargarVerificacionTabla();
         document.getElementById("buscarVerif")?.addEventListener("input", cargarVerificacionTabla);
+        document.getElementById("filtroLocalVerif")?.addEventListener("change", cargarVerificacionTabla);
     }
     
     function cargarVerificacionTabla() {
         const busqueda = document.getElementById("buscarVerif")?.value.toLowerCase() || "";
+        const localFiltro = document.getElementById("filtroLocalVerif")?.value || "TODOS";
         let filtrados = productos.filter(p => p.nombre.toLowerCase().includes(busqueda));
+        if(localFiltro !== "TODOS") filtrados = filtrados.filter(p => p.local === localFiltro);
+        
         const tbody = document.getElementById("verifBody");
-        if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
-            <td>${p.local}</td>
-            <td>${p.nombre.substring(0,30)}</td
-            <td>${p.cantidad}</td
-            <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td
-            <td><input type="text" id="prov_${p.id}" value="${p.proveedor||''}" class="input-verif"></td
-            <td><input type="text" id="fact_${p.id}" value="${p.factura||''}" class="input-verif"></td
-            <td><input type="text" id="obs_${p.id}" value="${p.obs||''}" class="input-verif"></td
-            <td><button class="btn-primary btn-sm" onclick="guardarVerificacion('${p.id}')">Guardar</button></td
-        <tr>`).join('');
+        if(tbody) {
+            tbody.innerHTML = filtrados.map(p => `
+                <tr>
+                    <td><strong>${p.local}</strong></td>
+                    <td>${p.nombre.substring(0,35)}</td>
+                    <td>${p.cantidad}</td>
+                    <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td>
+                    <td><input type="text" id="prov_${p.id}" value="${p.proveedor||''}" class="input-verif"></td>
+                    <td><input type="text" id="fact_${p.id}" value="${p.factura||''}" class="input-verif"></td>
+                    <td><input type="text" id="obs_${p.id}" value="${p.obs||''}" class="input-verif"></td>
+                    <td><button class="btn-primary btn-sm" onclick="guardarVerificacion('${p.id}')">Guardar</button></td>
+                </tr>
+            `).join('');
+        }
     }
     
     window.guardarVerificacion = (id) => {
@@ -370,15 +409,26 @@
             prod.factura = document.getElementById(`fact_${id}`).value;
             prod.obs = document.getElementById(`obs_${id}`).value;
             saveProductos();
-            mostrarToast("Producto actualizado");
+            mostrarToast("✅ Producto actualizado");
             cargarVerificacionTabla();
         }
+    };
+    
+    window.exportarVerificacion = function() {
+        const wsData = [["Local", "Producto", "Cantidad", "Precio", "Laboratorio", "Canje", "Lote", "Proveedor", "Factura", "Observaciones"]];
+        productos.forEach(p => { wsData.push([p.local, p.nombre, p.cantidad, p.precio, p.laboratorio, p.canje, p.lote, p.proveedor || "", p.factura || "", p.obs || ""]); });
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Verificacion");
+        XLSX.writeFile(wb, `verificacion_${new Date().toISOString().slice(0,10)}.xlsx`);
+        mostrarToast("Exportación completada");
     };
     
     function renderAdminPanel() {
         if(currentUser.rol !== "admin") { renderDashboard(); return; }
         const html = `<div class="card"><h3>👑 Administración de Usuarios</h3>
             <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> Crear Usuario</button>
+            <button class="btn-primary" onclick="importarExcel()"><i class="fas fa-file-upload"></i> Importar Excel</button>
             <div style="overflow-x:auto; margin-top:12px;"><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
             ${users.map(u => `<tr>
                 <td>${u.username}</td>
@@ -390,6 +440,48 @@
             </tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
+    
+    // ==================== IMPORTAR EXCEL ====================
+    window.importarExcel = function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx, .xls, .csv';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                
+                for(let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if(row[0] && row[1]) {
+                        productos.push({
+                            id: "p"+Date.now()+i,
+                            nombre: row[1] || "Producto",
+                            cantidad: parseInt(row[2]) || 1,
+                            precio: parseFloat(row[3]) || 0,
+                            fechaVenc: row[4] || "2026-12-31",
+                            lote: row[5] || "LOTE",
+                            laboratorio: row[6] || "LAB",
+                            local: row[7] || "UNION",
+                            canje: row[8] || "PENDIENTE",
+                            proveedor: row[9] || "",
+                            factura: row[10] || "",
+                            obs: row[11] || ""
+                        });
+                    }
+                }
+                saveProductos();
+                mostrarToast(`Importados ${rows.length-1} productos`);
+                renderMainApp();
+            };
+            reader.readAsArrayBuffer(file);
+        };
+        input.click();
+    };
     
     function renderMensajes() {
         const contactos = users.filter(u => u.username !== currentUser.username);
@@ -466,7 +558,7 @@
         if(rol.toLowerCase() === "usuario" && !BOTICAS.includes(botica)) { alert("Botica inválida"); return; }
         users.push({ id: "u"+Date.now(), username, password: pass, rol: rol.toLowerCase(), nombre, boticaAsignada: botica });
         saveUsers();
-        alert("Usuario creado");
+        alert("✅ Usuario creado");
         renderMainApp();
     };
     
