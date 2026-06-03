@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PharmaCanje Pro | Gestión de Canjes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f2b3a 0%, #1a4a62 100%); min-height: 100vh; }
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0a2b36 0%, #154e6b 100%); }
+        .login-card { background: white; border-radius: 32px; padding: 40px 35px; width: 420px; max-width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center; }
+        .login-icon { background: linear-gradient(135deg, #1b6b8f, #2c7da0); width: 70px; height: 70px; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .login-icon i { font-size: 35px; color: white; }
+        .login-card h1 { font-size: 26px; color: #1b6b8f; margin-bottom: 8px; }
+        .input-group { text-align: left; margin-bottom: 18px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: #5b7a92; margin-bottom: 5px; display: block; }
+        .input-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2edf2; border-radius: 28px; font-size: 14px; }
+        .input-group input:focus { outline: none; border-color: #2c7da0; }
+        .btn-login { width: 100%; background: linear-gradient(135deg, #2c7da0, #1b5e7a); color: white; border: none; padding: 12px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 16px; }
+        .demo-creds { background: #f0f6fa; border-radius: 20px; padding: 12px; margin-top: 20px; font-size: 11px; text-align: left; }
+        .app-container { display: flex; min-height: 100vh; background: #eef2f8; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #0a2b36 0%, #0f3b4a 100%); color: white; padding: 24px 18px; }
+        .logo { font-size: 1.3rem; font-weight: 700; margin-bottom: 35px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #2c6a84; padding-bottom: 18px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; margin: 5px 0; border-radius: 14px; cursor: pointer; transition: 0.2s; font-weight: 500; font-size: 0.85rem; }
+        .nav-item:hover, .nav-item.active { background: #2c7da0; }
+        .main-content { flex: 1; padding: 18px 24px; overflow-x: auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 22px; border-radius: 28px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logout-btn { background: #e74c3c; border: none; padding: 7px 18px; border-radius: 28px; color: white; cursor: pointer; font-size: 0.8rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 20px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 1.6rem; font-weight: 700; color: #1f5068; }
+        .stat-card p { font-size: 0.7rem; color: #5b7a92; }
+        .stat-card.active-filter { border: 2px solid #2c7da0; background: #e8f4f8; }
+        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        .card h3 { font-weight: 600; margin-bottom: 14px; border-left: 4px solid #2c7da0; padding-left: 12px; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e9eff4; }
+        th { background: #f8fafc; font-weight: 600; position: sticky; top: 0; }
+        .btn-primary { background: #2c7da0; color: white; border: none; padding: 5px 14px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; margin-right: 5px; }
+        .btn-danger { background: #c0392b; }
+        .btn-sm { padding: 4px 10px; font-size: 0.65rem; }
+        .badge-junio { background: #27ae60; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; display: inline-block; }
+        .filtros { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .filtros input, .filtros select { padding: 6px 12px; border-radius: 25px; border: 1px solid #cbdde6; font-size: 0.75rem; }
+        .notification-badge { background: #e74c3c; color: white; border-radius: 20px; padding: 2px 8px; font-size: 10px; margin-left: 8px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .chat-container { max-height: 350px; overflow-y: auto; margin-bottom: 14px; border: 1px solid #e2edf2; border-radius: 14px; padding: 12px; background: #f9fafc; }
+        .chat-message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; max-width: 80%; }
+        .chat-message.sent { background: #2c7da0; color: white; margin-left: auto; text-align: right; }
+        .chat-message.received { background: #e9eff4; }
+        .botica-chip { background: #e2edf2; padding: 5px 12px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; display: inline-block; margin: 3px; }
+        .botica-chip.active { background: #2c7da0; color: white; }
+        .notificacion-item { border-bottom: 1px solid #e2edf2; padding: 12px; margin-bottom: 6px; border-radius: 10px; background: #f9fafc; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #2c7da0; color: white; padding: 10px 18px; border-radius: 30px; z-index: 1000; animation: slideIn 0.3s ease; font-size: 0.8rem; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .input-verif { width: 85px; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; border: 1px solid #cbdde6; }
+        @media (max-width: 768px) { .sidebar { width: 70px; padding: 16px 8px; } .sidebar span:not(.logo-icon) { display: none; } .main-content { padding: 12px; } }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+    // ==================== DATOS COMPLETOS ====================
+    const BOTICAS = ["UNION", "LIBERTAD POMALCA", "VILLARREAL", "INCAS", "FORTALEZA POMALCA", "LAMBAYEQUE 2", "P.C", "LIBERTAD - LA VICTORIA", "LAMBAYEQUE 3", "LAMBAYEQUE 1"];
+    
+    let productos = [
+        { id: "p1", nombre: "HEMORRANE POMADA", cantidad: 1, precio: 28.90, fechaVenc: "2026-08-01", lote: "3140", laboratorio: "FAES FARMA", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-638278", obs: "" },
+        { id: "p2", nombre: "amoxicilina", cantidad: 3, precio: 12.00, fechaVenc: "2026-09-12", lote: "00012", laboratorio: "portugal", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "F001-1214", obs: "" },
+        { id: "p3", nombre: "ibuprofeno", cantidad: 2, precio: 23.00, fechaVenc: "2026-12-12", lote: "123123", laboratorio: "ac farma", local: "P.C", canje: "PENDIENTE", proveedor: "", factura: "", obs: "" },
+        { id: "p4", nombre: "M-VAT INYECTABLE", cantidad: 10, precio: 45.00, fechaVenc: "2026-11-01", lote: "XA3L005", laboratorio: "DROPESAC", local: "FORTALEZA POMALCA", canje: "JUNIO", proveedor: "DROPESAC", factura: "F001-13833", obs: "" },
+        { id: "p5", nombre: "NAYARA GEL", cantidad: 3, precio: 45.50, fechaVenc: "2026-10-01", lote: "314", laboratorio: "ITALFARMACO", local: "LIBERTAD POMALCA", canje: "JUNIO", proveedor: "DIMEXA", factura: "F700-295366", obs: "" },
+        { id: "p6", nombre: "BRIMODIN SOLUCION", cantidad: 2, precio: 32.00, fechaVenc: "2026-09-01", lote: "20900414", laboratorio: "IQ FARMA", local: "UNION", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-613657", obs: "" },
+        { id: "p7", nombre: "NISOPREX Suspensión", cantidad: 1, precio: 55.00, fechaVenc: "2026-06-01", lote: "2061332", laboratorio: "ELIFARMA", local: "UNION", canje: "JUNIO", proveedor: "QUIMICA", factura: "FF01-2625095", obs: "" },
+        { id: "p8", nombre: "DIMENS MONODOSIS", cantidad: 60, precio: 2.50, fechaVenc: "2026-08-01", lote: "2082233", laboratorio: "FARVET", local: "UNION", canje: "JUNIO", proveedor: "FARVET", factura: "E001-1697", obs: "" },
+        { id: "p9", nombre: "MULTIFLORA ADVANCE", cantidad: 30, precio: 55.00, fechaVenc: "2026-10-01", lote: "137106", laboratorio: "MEGALABS", local: "INCAS", canje: "JUNIO", proveedor: "DIFARLIB", factura: "F002-197057", obs: "" }
+    ];
+    
+    BOTICAS.forEach(b => {
+        if(!productos.some(p => p.local === b)) {
+            productos.push({ id: `gen_${b}`, nombre: "Producto Ejemplo", cantidad: 5, precio: 10.00, fechaVenc: "2026-12-01", lote: "L001", laboratorio: "LABGEN", local: b, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
+        }
+    });
+    
+    // ==================== USUARIOS ====================
+    let users = [
+        { id: "u1", username: "admin", password: "admin123", rol: "admin", nombre: "Administrador", boticaAsignada: null },
+        { id: "u2", username: "supervisor", password: "super123", rol: "supervisor", nombre: "Supervisora", boticaAsignada: null },
+        { id: "u3", username: "union", password: "union123", rol: "usuario", nombre: "Botica Unión", boticaAsignada: "UNION" },
+        { id: "u4", username: "libertad", password: "lib123", rol: "usuario", nombre: "Botica Libertad", boticaAsignada: "LIBERTAD POMALCA" },
+        { id: "u5", username: "villareal", password: "villa123", rol: "usuario", nombre: "Botica Villarreal", boticaAsignada: "VILLARREAL" },
+        { id: "u6", username: "incas", password: "incas123", rol: "usuario", nombre: "Botica Incas", boticaAsignada: "INCAS" },
+        { id: "u7", username: "fortaleza", password: "fort123", rol: "usuario", nombre: "Botica Fortaleza", boticaAsignada: "FORTALEZA POMALCA" },
+        { id: "u8", username: "pc", password: "pc123", rol: "usuario", nombre: "Botica P.C", boticaAsignada: "P.C" }
+    ];
+    
+    let mensajes = [];
+    let notificaciones = [];
+    let currentUser = null;
+    let chatSeleccionado = null;
+    let dashboardFiltroBotica = "TODOS";
+    
+    function saveUsers() { localStorage.setItem("pharma_users", JSON.stringify(users)); }
+    function saveProductos() { localStorage.setItem("pharma_productos", JSON.stringify(productos)); }
+    function saveMensajes() { localStorage.setItem("pharma_mensajes", JSON.stringify(mensajes)); }
+    function saveNotificaciones() { localStorage.setItem("pharma_notificaciones", JSON.stringify(notificaciones)); }
+    
+    function initData() {
+        const storedUsers = localStorage.getItem("pharma_users");
+        if(storedUsers) users = JSON.parse(storedUsers);
+        else localStorage.setItem("pharma_users", JSON.stringify(users));
+        const storedProductos = localStorage.getItem("pharma_productos");
+        if(storedProductos) productos = JSON.parse(storedProductos);
+        else localStorage.setItem("pharma_productos", JSON.stringify(productos));
+        const storedMensajes = localStorage.getItem("pharma_mensajes");
+        mensajes = storedMensajes ? JSON.parse(storedMensajes) : [];
+        const storedNotificaciones = localStorage.getItem("pharma_notificaciones");
+        notificaciones = storedNotificaciones ? JSON.parse(storedNotificaciones) : [];
+        if(mensajes.length === 0) localStorage.setItem("pharma_mensajes", JSON.stringify([]));
+        if(notificaciones.length === 0) localStorage.setItem("pharma_notificaciones", JSON.stringify([]));
+    }
+    
+    function mostrarToast(mensaje) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerHTML = `<i class="fas fa-bell"></i> ${mensaje}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function agregarNotificacion(usuarioDestino, titulo, mensaje) {
+        notificaciones.push({ id: Date.now(), usuario: usuarioDestino, titulo, mensaje, fecha: new Date().toLocaleString(), leido: false });
+        saveNotificaciones();
+        if(currentUser && currentUser.username === usuarioDestino) mostrarToast(`${titulo}: ${mensaje}`);
+    }
+    
+    // ==================== LOGIN ====================
+    window.doLogin = function() {
+        const user = document.getElementById("loginUser").value;
+        const pass = document.getElementById("loginPass").value;
+        const found = users.find(u => u.username === user && u.password === pass);
+        if(found) {
+            currentUser = { ...found };
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            renderMainApp();
+        } else alert("❌ Credenciales incorrectas");
+    };
+    
+    function logout() { currentUser = null; localStorage.removeItem("currentUser"); renderLogin(); }
+    
+    function renderLogin() {
+        document.getElementById("root").innerHTML = `
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-icon"><i class="fas fa-pills"></i></div>
+                    <h1>PharmaCanje Pro</h1>
+                    <p>Sistema de gestión de canjes</p>
+                    <div class="input-group"><label>USUARIO</label><input type="text" id="loginUser" placeholder="Usuario"></div>
+                    <div class="input-group"><label>CONTRASEÑA</label><input type="password" id="loginPass" placeholder="••••••"></div>
+                    <button class="btn-login" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Ingresar</button>
+                    <div class="demo-creds"><strong>🔐 Credenciales:</strong><br>👑 admin/admin123 | 👩‍💼 supervisor/super123<br>🏪 union/union123 | libertad/lib123 | villareal/villa123<br>🏪 incas/incas123 | fortaleza/fort123 | pc/pc123</div>
+                </div>
+            </div>`;
+        document.getElementById("loginPass")?.addEventListener("keypress", e => { if(e.key === "Enter") window.doLogin(); });
+    }
+    
+    function renderMainApp() {
+        if(!currentUser) { renderLogin(); return; }
+        const isAdmin = currentUser.rol === "admin";
+        const isSupervisor = currentUser.rol === "supervisor";
+        const miBotica = currentUser.boticaAsignada;
+        
+        const notifNoLeidas = notificaciones.filter(n => n.usuario === currentUser.username && !n.leido).length;
+        
+        let sidebarHtml = `<div class="logo"><i class="fas fa-pills"></i><span>PharmaCanje</span></div>`;
+        const menus = [
+            { id: "dashboard", icon: "fa-chart-line", label: "Dashboard" },
+            { id: "misProductos", icon: "fa-boxes", label: "Mis Productos" },
+            { id: "verBoticas", icon: "fa-store", label: "Ver Boticas" },
+            { id: "misCanjes", icon: "fa-calendar-check", label: "Mis Canjes" },
+            { id: "politicas", icon: "fa-file-alt", label: "Políticas" }
+        ];
+        if(isAdmin || isSupervisor) menus.push({ id: "verificar", icon: "fa-check-double", label: "Verificar" });
+        if(isAdmin) menus.push({ id: "adminPanel", icon: "fa-user-shield", label: "Admin Panel" });
+        menus.push({ id: "mensajes", icon: "fa-comment-dots", label: "Mensajes" });
+        menus.push({ id: "notificaciones", icon: "fa-bell", label: `Notificaciones${notifNoLeidas ? `<span class="notification-badge">${notifNoLeidas}</span>` : ""}` });
+        
+        menus.forEach(m => { sidebarHtml += `<div class="nav-item" data-tab="${m.id}"><i class="fas ${m.icon}"></i><span>${m.label}</span></div>`; });
+        
+        document.getElementById("root").innerHTML = `
+            <div class="app-container"><div class="sidebar">${sidebarHtml}</div>
+            <div class="main-content"><div class="top-bar">
+                <div><i class="fas fa-store"></i> <strong>${isAdmin ? "ADMINISTRADOR" : (isSupervisor ? "SUPERVISORA" : `BOTICA: ${miBotica}`)}</strong></div>
+                <div><span><i class="fas fa-user"></i> ${currentUser.nombre}</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            </div><div id="dynamicContent"></div></div></div>`;
+        
+        document.querySelectorAll(".nav-item").forEach(nav => {
+            nav.addEventListener("click", () => {
+                document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+                nav.classList.add("active");
+                const tab = nav.dataset.tab;
+                if(tab === "dashboard") renderDashboard();
+                else if(tab === "misProductos") renderMisProductos();
+                else if(tab === "verBoticas") renderVerBoticas();
+                else if(tab === "misCanjes") renderMisCanjes();
+                else if(tab === "politicas") renderPoliticas();
+                else if(tab === "verificar") renderVerificar();
+                else if(tab === "adminPanel") renderAdminPanel();
+                else if(tab === "mensajes") renderMensajes();
+                else if(tab === "notificaciones") renderNotificaciones();
+            });
+        });
+        renderDashboard();
+    }
+    
+    function renderDashboard() {
+        const porBotica = {};
+        const porCanje = {};
+        productos.forEach(p => {
+            porBotica[p.local] = (porBotica[p.local] || 0) + (Number(p.cantidad) || 0);
+            porCanje[p.canje] = (porCanje[p.canje] || 0) + (Number(p.cantidad) || 0);
+        });
+        
+        const html = `
+            <div class="stats-grid">
+                ${BOTICAS.slice(0,8).map(b => `<div class="stat-card ${dashboardFiltroBotica === b ? 'active-filter' : ''}" onclick="setDashboardFiltro('${b}')"><h3>${porBotica[b] || 0}</h3><p>${b.substring(0,12)}</p></div>`).join('')}
+                <div class="stat-card ${dashboardFiltroBotica === 'TODOS' ? 'active-filter' : ''}" onclick="setDashboardFiltro('TODOS')"><h3>${productos.reduce((a,b)=>a+(Number(b.cantidad)||0),0)}</h3><p>TODAS</p></div>
+            </div>
+            <div class="card"><h3>📊 Distribución por Mes de Canje</h3><canvas id="mesChart" height="180"></canvas></div>
+            <div class="card"><h3>🏭 Top Laboratorios</h3><canvas id="labChart" height="180"></canvas></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+        
+        let filtrados = dashboardFiltroBotica === "TODOS" ? productos : productos.filter(p => p.local === dashboardFiltroBotica);
+        const porMes = {};
+        filtrados.forEach(p => { let m = p.canje || "SIN"; porMes[m] = (porMes[m]||0)+(Number(p.cantidad)||0); });
+        const ctxMes = document.getElementById("mesChart")?.getContext("2d");
+        if(ctxMes) new Chart(ctxMes, { type:'bar', data:{ labels:Object.keys(porMes), datasets:[{ label:'Unidades', data:Object.values(porMes), backgroundColor:'#2c7da0', borderRadius:6 }] }, options:{ responsive: true, maintainAspectRatio: true } });
+        
+        const topLab = {};
+        filtrados.forEach(p => { topLab[p.laboratorio] = (topLab[p.laboratorio]||0)+(Number(p.cantidad)||0); });
+        const topLabArray = Object.entries(topLab).sort((a,b)=>b[1]-a[1]).slice(0,6);
+        const ctxLab = document.getElementById("labChart")?.getContext("2d");
+        if(ctxLab) new Chart(ctxLab, { type:'bar', data:{ labels:topLabArray.map(l=>l[0]), datasets:[{ label:'Unidades', data:topLabArray.map(l=>l[1]), backgroundColor:'#61a5c2', borderRadius:6 }] }, options:{ responsive: true, maintainAspectRatio: true } });
+    }
+    
+    window.setDashboardFiltro = function(botica) { dashboardFiltroBotica = botica; renderDashboard(); };
+    
+    function renderMisProductos() {
+        const miLocal = currentUser.boticaAsignada;
+        let productosLocal = productos.filter(p => p.local === miLocal);
+        const html = `<div class="card"><h3>📦 Mis Productos - ${miLocal}</h3>
+            <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
+            <div style="overflow-x:auto; margin-top:12px;"><table><thead><tr><th>Producto</th><th>Cant</th><th>Precio</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></tr></thead><tbody>
+            ${productosLocal.map(p => `<tr>
+                <td>${p.nombre.substring(0,40)}</td>
+                <td>${p.cantidad}</td>
+                <td>S/ ${(p.precio||0).toFixed(2)}</td>
+                <td>${p.fechaVenc}</td>
+                <td>${p.lote}</td>
+                <td>${p.laboratorio}</td>
+                <td>${p.canje === "JUNIO" ? '<span class="badge-junio">JUNIO</span>' : p.canje}</td>
+                <td><button class="btn-primary btn-sm" onclick="editarProducto('${p.id}')">Editar</button> <button class="btn-danger btn-sm" onclick="eliminarProducto('${p.id}')">Elim</button></td>
+            </tr>`).join('')}
+            </tbody></table></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+    }
+    
+    function renderVerBoticas() {
+        const html = `
+            <div class="card"><h3>🏪 Visualización General de Boticas</h3>
+            <div class="filtros">
+                <select id="filtroLocalVB"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
+                <input type="text" id="filtroLabVB" placeholder="Laboratorio...">
+                <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="BONIFICACION">BONIFICACION</option></select>
+                <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
+            </div>
+            <div style="overflow-x:auto; max-height:450px;"><table><thead><tr><th>Local</th><th>Producto</th><th>Cant</th><th>Precio</th><th>Laboratorio</th><th>Canje</th></tr></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+        filtrarVBTabla();
+        document.getElementById("filtroLocalVB")?.addEventListener("change", filtrarVBTabla);
+        document.getElementById("filtroLabVB")?.addEventListener("input", filtrarVBTabla);
+        document.getElementById("filtroCanjeVB")?.addEventListener("change", filtrarVBTabla);
+    }
+    
+    function filtrarVBTabla() {
+        const local = document.getElementById("filtroLocalVB")?.value || "TODOS";
+        const lab = (document.getElementById("filtroLabVB")?.value || "").toLowerCase();
+        const canje = document.getElementById("filtroCanjeVB")?.value || "TODOS";
+        let filtrados = productos;
+        if(local !== "TODOS") filtrados = filtrados.filter(p => p.local === local);
+        if(lab) filtrados = filtrados.filter(p => p.laboratorio.toLowerCase().includes(lab));
+        if(canje !== "TODOS") filtrados = filtrados.filter(p => p.canje === canje);
+        
+        const tbody = document.getElementById("tablaVBBody");
+        if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
+            <td><strong>${p.local}</strong></td>
+            <td>${p.nombre.substring(0,45)}</td>
+            <td>${p.cantidad}</td>
+            <td>S/ ${(p.precio||0).toFixed(2)}</td>
+            <td>${p.laboratorio}</td>
+            <td>${p.canje}</td>
+        </tr>`).join('');
+    }
+    
+    function renderMisCanjes() {
+        const miLocal = currentUser.boticaAsignada;
+        const meses = ["JUNIO", "JULIO", "AGOSTO", "PENDIENTE"];
+        const html = `
+            <div class="card"><h3>📅 Productos en Canje - ${miLocal}</h3>
+            <div class="filtros">${meses.map(m => `<button class="btn-primary" onclick="filtrarCanjesPorMes('${m}')">${m}</button>`).join('')}</div>
+            <div id="tablaCanjesMes"></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+        filtrarCanjesPorMes("JUNIO");
+    }
+    
+    window.filtrarCanjesPorMes = function(mes) {
+        const miLocal = currentUser.boticaAsignada;
+        const filtrados = productos.filter(p => p.local === miLocal && p.canje === mes);
+        const html = `<table><thead><tr><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></tr></thead><tbody>
+            ${filtrados.map(p => `<tr><td>${p.nombre}</td><td>${p.cantidad}</td><td>${p.laboratorio}</td><td>${p.proveedor || '-'}</td><td>${p.factura || '-'}</td></tr>`).join('') || '<tr><td colspan="5">No hay productos para este mes</td></tr>'}
+        </tbody></table>`;
+        document.getElementById("tablaCanjesMes").innerHTML = html;
+    };
+    
+    function renderPoliticas() {
+        const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "IQ FARMA": "Canje con autorización.", "ELIFARMA": "Coordinar con representante.", "TECNOFARMA": "Canje automático +60 días.", "LANSIER": "Últimos 3 meses.", "BAYER": "Máximo 30 días.", "default": "Consultar con proveedor." };
+        const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br><span style="font-size:0.75rem;">${pol}</span></div>`).join('')}</div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+    }
+    
+    function renderVerificar() {
+        if(currentUser.rol !== "admin" && currentUser.rol !== "supervisor") { renderDashboard(); return; }
+        const puedeEditarTodo = currentUser.rol === "admin";
+        const html = `
+            <div class="card"><h3>✅ Verificación de Productos</h3>
+            <div class="filtros"><input type="text" id="buscarVerif" placeholder="Buscar producto..."></div>
+            <div style="overflow-x:auto; max-height:500px;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th></th></thead><tbody id="verifBody"></tbody></table></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+        cargarVerificacionTabla();
+        document.getElementById("buscarVerif")?.addEventListener("input", cargarVerificacionTabla);
+    }
+    
+    function cargarVerificacionTabla() {
+        const busqueda = document.getElementById("buscarVerif")?.value.toLowerCase() || "";
+        let filtrados = productos.filter(p => p.nombre.toLowerCase().includes(busqueda));
+        const tbody = document.getElementById("verifBody");
+        if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
+            <td>${p.local}</td>
+            <td>${p.nombre.substring(0,30)}</td
+            <td>${p.cantidad}</td
+            <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td
+            <td><input type="text" id="prov_${p.id}" value="${p.proveedor||''}" class="input-verif"></td
+            <td><input type="text" id="fact_${p.id}" value="${p.factura||''}" class="input-verif"></td
+            <td><input type="text" id="obs_${p.id}" value="${p.obs||''}" class="input-verif"></td
+            <td><button class="btn-primary btn-sm" onclick="guardarVerificacion('${p.id}')">Guardar</button></td
+        <tr>`).join('');
+    }
+    
+    window.guardarVerificacion = (id) => {
+        const prod = productos.find(p=>p.id===id);
+        if(prod) {
+            prod.canje = document.getElementById(`canje_${id}`).value;
+            prod.proveedor = document.getElementById(`prov_${id}`).value;
+            prod.factura = document.getElementById(`fact_${id}`).value;
+            prod.obs = document.getElementById(`obs_${id}`).value;
+            saveProductos();
+            mostrarToast("Producto actualizado");
+            cargarVerificacionTabla();
+        }
+    };
+    
+    function renderAdminPanel() {
+        if(currentUser.rol !== "admin") { renderDashboard(); return; }
+        const html = `<div class="card"><h3>👑 Administración de Usuarios</h3>
+            <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> Crear Usuario</button>
+            <div style="overflow-x:auto; margin-top:12px;"><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
+            ${users.map(u => `<tr>
+                <td>${u.username}</td>
+                <td>${u.nombre}</td>
+                <td>${u.rol}</td>
+                <td>${u.boticaAsignada || '-'}</td>
+                <td><button class="btn-danger btn-sm" onclick="eliminarUsuario('${u.id}')">Eliminar</button></td>
+            </tr>`).join('')}
+            </tbody></table></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+    }
+    
+    function renderMensajes() {
+        const contactos = users.filter(u => u.username !== currentUser.username);
+        const html = `<div class="card"><h3>💬 Mensajes</h3>
+            <div class="filtros">${contactos.map(c => `<div class="botica-chip ${chatSeleccionado === c.username ? 'active' : ''}" onclick="seleccionarChat('${c.username}')">${c.nombre}</div>`).join('')}</div>
+            ${chatSeleccionado ? `<div class="chat-container" id="chatContainer"></div><div style="display:flex; gap:6px;"><input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." style="flex:1;"><button class="btn-primary" onclick="enviarMensajeChat()">Enviar</button></div>` : '<p>Selecciona un contacto para chatear</p>'}
+            </div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+        if(chatSeleccionado) cargarChat();
+    }
+    
+    function cargarChat() {
+        const chatDiv = document.getElementById("chatContainer");
+        if(!chatDiv) return;
+        const conversacion = mensajes.filter(m => (m.de === currentUser.username && m.para === chatSeleccionado) || (m.de === chatSeleccionado && m.para === currentUser.username));
+        chatDiv.innerHTML = conversacion.map(m => `<div class="chat-message ${m.de === currentUser.username ? 'sent' : 'received'}"><strong>${m.de === currentUser.username ? 'Yo' : m.de}</strong><br>${m.texto}<br><small>${m.fecha}</small></div>`).join('');
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+    
+    window.seleccionarChat = function(username) { chatSeleccionado = username; renderMensajes(); };
+    window.enviarMensajeChat = function() {
+        const texto = document.getElementById("mensajeInput")?.value;
+        if(texto && chatSeleccionado) {
+            mensajes.push({ id: Date.now(), de: currentUser.username, para: chatSeleccionado, texto, fecha: new Date().toLocaleString(), leido: false });
+            saveMensajes();
+            agregarNotificacion(chatSeleccionado, "Nuevo mensaje", `${currentUser.nombre}: ${texto.substring(0,50)}`);
+            document.getElementById("mensajeInput").value = "";
+            cargarChat();
+        }
+    };
+    
+    function renderNotificaciones() {
+        const misNotif = notificaciones.filter(n => n.usuario === currentUser.username);
+        misNotif.forEach(n => n.leido = true);
+        saveNotificaciones();
+        const html = `<div class="card"><h3>🔔 Buzón de Notificaciones</h3>
+            <div>${misNotif.length === 0 ? '<p>No hay notificaciones</p>' : misNotif.map(n => `<div class="notificacion-item"><strong>${n.titulo}</strong><br>${n.mensaje}<br><small>${n.fecha}</small></div>`).join('')}</div>
+            <button class="btn-primary" onclick="marcarTodasLeidas()" style="margin-top:10px;">Marcar todas como leídas</button>
+            </div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+    }
+    
+    window.marcarTodasLeidas = function() {
+        notificaciones.filter(n => n.usuario === currentUser.username).forEach(n => n.leido = true);
+        saveNotificaciones();
+        renderNotificaciones();
+        mostrarToast("Todas marcadas como leídas");
+    };
+    
+    window.agregarProducto = function() {
+        let nombre = prompt("Nombre del producto"); if(!nombre) return;
+        let cantidad = parseInt(prompt("Cantidad")); let precio = parseFloat(prompt("Precio S/")) || 0;
+        let venc = prompt("Fecha vencimiento (YYYY-MM-DD)"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
+        productos.push({ id: "p"+Date.now(), nombre, cantidad, precio, fechaVenc: venc, lote, laboratorio: lab, local: currentUser.boticaAsignada, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
+        saveProductos();
+        mostrarToast("Producto agregado");
+        renderMainApp();
+    };
+    
+    window.editarProducto = (id) => {
+        let p = productos.find(p=>p.id===id);
+        if(p) { p.nombre = prompt("Nuevo nombre", p.nombre) || p.nombre; p.cantidad = parseInt(prompt("Cantidad", p.cantidad)); p.precio = parseFloat(prompt("Precio", p.precio)); saveProductos(); renderMainApp(); }
+    };
+    
+    window.eliminarProducto = (id) => { if(confirm("¿Eliminar producto?")) { productos = productos.filter(p=>p.id!==id); saveProductos(); renderMainApp(); } };
+    
+    window.crearUsuario = () => {
+        let username = prompt("Usuario"); if(!username) return;
+        let pass = prompt("Contraseña");
+        let rol = prompt("Rol (admin / supervisor / usuario)");
+        if(!["admin","supervisor","usuario"].includes(rol.toLowerCase())) { alert("Rol inválido"); return; }
+        let nombre = prompt("Nombre completo");
+        let botica = rol.toLowerCase() === "usuario" ? prompt("Botica: " + BOTICAS.join(", ")) : null;
+        if(rol.toLowerCase() === "usuario" && !BOTICAS.includes(botica)) { alert("Botica inválida"); return; }
+        users.push({ id: "u"+Date.now(), username, password: pass, rol: rol.toLowerCase(), nombre, boticaAsignada: botica });
+        saveUsers();
+        alert("Usuario creado");
+        renderMainApp();
+    };
+    
+    window.eliminarUsuario = (id) => { users = users.filter(u=>u.id!==id); saveUsers(); renderMainApp(); };
+    
+    window.exportarExcel = function() {
+        const wsData = [["Local", "Producto", "Cantidad", "Precio", "Laboratorio", "Canje", "Lote", "Proveedor", "Factura"]];
+        productos.forEach(p => { wsData.push([p.local, p.nombre, p.cantidad, p.precio, p.laboratorio, p.canje, p.lote, p.proveedor || "", p.factura || ""]); });
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Canjes");
+        XLSX.writeFile(wb, `canjes_${new Date().toISOString().slice(0,10)}.xlsx`);
+        mostrarToast("Exportación completada");
+    };
+    
+    initData();
+    const storedUser = localStorage.getItem("currentUser");
+    if(storedUser) { currentUser = JSON.parse(storedUser); renderMainApp(); }
+    else renderLogin();
+</script>
+</body>
+</html>
