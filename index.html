@@ -64,18 +64,17 @@
 <div id="root"></div>
 
 <script>
+    // ==================== CONFIGURACIÓN ====================
+    // 👇 PEGA AQUÍ EL ENLACE DE TU GOOGLE SHEETS PUBLICADO COMO CSV
+    const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo6ZluYoz8urGFCNinRJmIGepUZjwc-cHNOyBIIR7AbnqFDzf8EbB3SSgecacw6A/pub?output=csv";
+    
     const BOTICAS = ["UNION", "LIBERTAD POMALCA", "VILLARREAL", "INCAS", "FORTALEZA POMALCA", "LAMBAYEQUE 2", "P.C", "LIBERTAD - LA VICTORIA", "LAMBAYEQUE 3", "LAMBAYEQUE 1"];
     
     let productos = [
+        // Datos de ejemplo
         { id: "p1", nombre: "HEMORRANE POMADA", cantidad: 1, precio: 28.90, fechaVenc: "2026-08-01", lote: "3140", laboratorio: "FAES FARMA", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-638278", obs: "" },
         { id: "p2", nombre: "amoxicilina", cantidad: 3, precio: 12.00, fechaVenc: "2026-09-12", lote: "00012", laboratorio: "portugal", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "F001-1214", obs: "" },
-        { id: "p3", nombre: "ibuprofeno", cantidad: 2, precio: 23.00, fechaVenc: "2026-12-12", lote: "123123", laboratorio: "ac farma", local: "P.C", canje: "PENDIENTE", proveedor: "", factura: "", obs: "" },
-        { id: "p4", nombre: "M-VAT INYECTABLE", cantidad: 10, precio: 45.00, fechaVenc: "2026-11-01", lote: "XA3L005", laboratorio: "DROPESAC", local: "FORTALEZA POMALCA", canje: "JUNIO", proveedor: "DROPESAC", factura: "F001-13833", obs: "" },
-        { id: "p5", nombre: "NAYARA GEL", cantidad: 3, precio: 45.50, fechaVenc: "2026-10-01", lote: "314", laboratorio: "ITALFARMACO", local: "LIBERTAD POMALCA", canje: "JUNIO", proveedor: "DIMEXA", factura: "F700-295366", obs: "" },
-        { id: "p6", nombre: "BRIMODIN SOLUCION", cantidad: 2, precio: 32.00, fechaVenc: "2026-09-01", lote: "20900414", laboratorio: "IQ FARMA", local: "UNION", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-613657", obs: "" },
-        { id: "p7", nombre: "NISOPREX Suspensión", cantidad: 1, precio: 55.00, fechaVenc: "2026-06-01", lote: "2061332", laboratorio: "ELIFARMA", local: "UNION", canje: "JUNIO", proveedor: "QUIMICA", factura: "FF01-2625095", obs: "" },
-        { id: "p8", nombre: "DIMENS MONODOSIS", cantidad: 60, precio: 2.50, fechaVenc: "2026-08-01", lote: "2082233", laboratorio: "FARVET", local: "UNION", canje: "JUNIO", proveedor: "FARVET", factura: "E001-1697", obs: "" },
-        { id: "p9", nombre: "MULTIFLORA ADVANCE", cantidad: 30, precio: 55.00, fechaVenc: "2026-10-01", lote: "137106", laboratorio: "MEGALABS", local: "INCAS", canje: "JUNIO", proveedor: "DIFARLIB", factura: "F002-197057", obs: "" }
+        { id: "p3", nombre: "ibuprofeno", cantidad: 2, precio: 23.00, fechaVenc: "2026-12-12", lote: "123123", laboratorio: "ac farma", local: "P.C", canje: "PENDIENTE", proveedor: "", factura: "", obs: "" }
     ];
     
     let users = [
@@ -95,6 +94,7 @@
     let chatSeleccionado = null;
     let dashboardFiltroBotica = "TODOS";
     
+    // ==================== FUNCIONES DE ALMACENAMIENTO ====================
     function saveUsers() { localStorage.setItem("pharma_users", JSON.stringify(users)); }
     function saveProductos() { localStorage.setItem("pharma_productos", JSON.stringify(productos)); }
     function saveMensajes() { localStorage.setItem("pharma_mensajes", JSON.stringify(mensajes)); }
@@ -114,6 +114,56 @@
         if(currentUser && currentUser.username === usuarioDestino) mostrarToast(`${titulo}: ${mensaje}`);
     }
     
+    // ==================== CARGA DE DATOS ====================
+    async function cargarDatosDesdeGoogleSheets() {
+        if(GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes("2PACX")) {
+            mostrarToast("🔄 Cargando datos desde Google Sheets...");
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+                if(lines.length > 1) {
+                    const nuevosProductos = [];
+                    for(let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if(!line) continue;
+                        const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+                        if(values[0] && values[0] !== "LOCAL") {
+                            nuevosProductos.push({
+                                id: "p"+Date.now()+i,
+                                local: values[0] || "UNION",
+                                nombre: values[1] || "Producto",
+                                cantidad: parseInt(values[2]) || 1,
+                                lote: values[3] || "LOTE",
+                                laboratorio: values[4] || "LAB",
+                                canje: values[5] || "PENDIENTE",
+                                proveedor: values[6] || "",
+                                factura: values[7] || "",
+                                fechaVenc: values[8] || "2026-12-31",
+                                obs: values[9] || "",
+                                precio: 0
+                            });
+                        }
+                    }
+                    if(nuevosProductos.length > 0) {
+                        productos = nuevosProductos;
+                        saveProductos();
+                        mostrarToast(`✅ ${nuevosProductos.length} productos cargados desde Google Sheets`);
+                        renderMainApp();
+                        return true;
+                    }
+                }
+                mostrarToast("⚠️ No se encontraron datos en Google Sheets");
+                return false;
+            } catch(error) {
+                console.error("Error al cargar:", error);
+                mostrarToast("❌ Error al cargar datos desde Google Sheets");
+                return false;
+            }
+        }
+        return false;
+    }
+    
     window.importarExcel = function() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -125,8 +175,7 @@
                 try {
                     const data = new Uint8Array(evt.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                     
                     const nuevosProductos = [];
@@ -159,7 +208,7 @@
                         mostrarToast(`✅ ${contador} productos importados correctamente!`);
                         renderMainApp();
                     } else {
-                        alert("No se encontraron datos. Verifica que el archivo tenga datos en las columnas correctas.");
+                        alert("No se encontraron datos. Verifica que el archivo tenga los datos en las columnas correctas.");
                     }
                 } catch(error) {
                     alert("Error al leer el archivo: " + error.message);
@@ -182,6 +231,7 @@
         mostrarToast("Exportación completada");
     };
     
+    // ==================== LOGIN ====================
     window.doLogin = function() {
         const user = document.getElementById("loginUser").value;
         const pass = document.getElementById("loginPass").value;
@@ -212,6 +262,7 @@
         document.getElementById("loginPass")?.addEventListener("keypress", e => { if(e.key === "Enter") window.doLogin(); });
     }
     
+    // ==================== RENDER PRINCIPAL ====================
     function renderMainApp() {
         if(!currentUser) { renderLogin(); return; }
         const isAdmin = currentUser.rol === "admin";
@@ -262,10 +313,8 @@
         renderDashboard();
     }
     
+    // ==================== DASHBOARD ====================
     function renderDashboard() {
-        const porBotica = {};
-        productos.forEach(p => { porBotica[p.local] = (porBotica[p.local] || 0) + (Number(p.cantidad) || 0); });
-        
         const totalProductos = productos.length;
         const totalUnidades = productos.reduce((a,b)=>a+(Number(b.cantidad)||0),0);
         const junioUnidades = productos.filter(p=>p.canje==="JUNIO").reduce((a,b)=>a+(Number(b.cantidad)||0),0);
@@ -295,12 +344,13 @@
         if(ctxLab) new Chart(ctxLab, { type:'bar', data:{ labels:topLabArray.map(l=>l[0]), datasets:[{ label:'Unidades', data:topLabArray.map(l=>l[1]), backgroundColor:'#61a5c2', borderRadius:6 }] }, options:{ responsive: true, maintainAspectRatio: true } });
     }
     
+    // ==================== MIS PRODUCTOS ====================
     function renderMisProductos() {
         const miLocal = currentUser.boticaAsignada;
         let productosLocal = productos.filter(p => p.local === miLocal);
         const html = `<div class="card"><h3>📦 Mis Productos - ${miLocal} (${productosLocal.length})</h3>
             <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
-            <div style="overflow-x:auto; margin-top:12px;"><tr><thead><tr><th>Producto</th><th>Cant</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></tr></thead><tbody>
+            <div style="overflow-x:auto; margin-top:12px;"><td><thead><tr><th>Producto</th><th>Cant</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></tr></thead><tbody>
             ${productosLocal.map(p => `<tr>
                 <td>${p.nombre.substring(0,45)}</td
                 <td>${p.cantidad}</td
@@ -314,6 +364,7 @@
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
+    // ==================== VER BOTICAS ====================
     function renderVerBoticas() {
         const html = `
             <div class="card"><h3>🏪 Visualización General de Boticas (${productos.length} productos)</h3>
@@ -323,7 +374,7 @@
                 <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="PENDIENTE">PENDIENTE</option></select>
                 <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
             </div>
-            <div style="overflow-x:auto; max-height:450px;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Lote</th><th>Laboratorio</th><th>Canje</th></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
+            <div style="overflow-x:auto; max-height:450px;"><tr><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Lote</th><th>Laboratorio</th><th>Canje</th></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         filtrarVBTabla();
         document.getElementById("filtroLocalVB")?.addEventListener("change", filtrarVBTabla);
@@ -351,6 +402,7 @@
         </tr>`).join('');
     }
     
+    // ==================== MIS CANJES ====================
     function renderMisCanjes() {
         const miLocal = currentUser.boticaAsignada;
         const meses = ["JUNIO", "JULIO", "AGOSTO", "PENDIENTE"];
@@ -365,7 +417,7 @@
     window.filtrarCanjesPorMes = function(mes) {
         const miLocal = currentUser.boticaAsignada;
         const filtrados = productos.filter(p => p.local === miLocal && p.canje === mes);
-        const html = `<table><thead><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></thead><tbody>
+        const html = `<td><thead><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></thead><tbody>
             ${filtrados.map(p => `<tr>
                 <td>${p.nombre}</td
                 <td>${p.cantidad}</td
@@ -373,16 +425,18 @@
                 <td>${p.proveedor || '-'}</td
                 <td>${p.factura || '-'}</td
             </tr>`).join('') || '<tr><td colspan="5">No hay productos para este mes</td</tr>'}
-        </tbody></table>`;
+        </tbody><table>`;
         document.getElementById("tablaCanjesMes").innerHTML = html;
     };
     
+    // ==================== POLÍTICAS ====================
     function renderPoliticas() {
         const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "IQ FARMA": "Canje con autorización.", "ELIFARMA": "Coordinar con representante.", "TECNOFARMA": "Canje automático +60 días.", "LANSIER": "Últimos 3 meses.", "BAYER": "Máximo 30 días.", "default": "Consultar con proveedor." };
         const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br><span style="font-size:0.75rem;">${pol}</span></div>`).join('')}</div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
+    // ==================== VERIFICAR ====================
     function renderVerificar() {
         if(currentUser.rol !== "admin" && currentUser.rol !== "supervisor") { renderDashboard(); return; }
         
@@ -434,15 +488,17 @@
         }
     };
     
+    // ==================== ADMIN PANEL ====================
     function renderAdminPanel() {
         if(currentUser.rol !== "admin") { renderDashboard(); return; }
         const html = `<div class="card"><h3>👑 Administración de Datos y Usuarios</h3>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
                 <button class="btn-primary" onclick="importarExcel()"><i class="fas fa-file-upload"></i> 📂 Importar Excel</button>
                 <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> 📥 Exportar a Excel</button>
+                <button class="btn-primary" onclick="cargarDatosDesdeGoogleSheets()"><i class="fas fa-sync-alt"></i> 🔄 Cargar desde Google Sheets</button>
                 <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> 👤 Crear Usuario</button>
             </div>
-            <div style="overflow-x:auto;"><h4>👥 Usuarios Registrados</h4><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
+            <div style="overflow-x:auto;"><h4>👥 Usuarios Registrados</h4><tr><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
             ${users.map(u => `<tr>
                 <td>${u.username}</td
                 <td>${u.nombre}</td
@@ -454,6 +510,7 @@
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
+    // ==================== MENSAJES ====================
     function renderMensajes() {
         const contactos = users.filter(u => u.username !== currentUser.username);
         const html = `<div class="card"><h3>💬 Mensajes</h3>
@@ -484,6 +541,7 @@
         }
     };
     
+    // ==================== NOTIFICACIONES ====================
     function renderNotificaciones() {
         const misNotif = notificaciones.filter(n => n.usuario === currentUser.username);
         misNotif.forEach(n => n.leido = true);
@@ -502,6 +560,7 @@
         mostrarToast("Todas marcadas como leídas");
     };
     
+    // ==================== CRUD DE PRODUCTOS ====================
     window.agregarProducto = function() {
         let nombre = prompt("Nombre del producto"); if(!nombre) return;
         let cantidad = parseInt(prompt("Cantidad")); let venc = prompt("Fecha vencimiento (YYYY-MM-DD)"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
@@ -518,6 +577,7 @@
     
     window.eliminarProducto = (id) => { if(confirm("¿Eliminar producto?")) { productos = productos.filter(p=>p.id!==id); saveProductos(); renderMainApp(); } };
     
+    // ==================== CRUD DE USUARIOS ====================
     window.crearUsuario = () => {
         let username = prompt("Usuario"); if(!username) return;
         let pass = prompt("Contraseña");
@@ -534,6 +594,7 @@
     
     window.eliminarUsuario = (id) => { users = users.filter(u=>u.id!==id); saveUsers(); renderMainApp(); };
     
+    // ==================== INICIALIZACIÓN ====================
     function init() {
         const storedUsers = localStorage.getItem("pharma_users");
         if(storedUsers) users = JSON.parse(storedUsers);
