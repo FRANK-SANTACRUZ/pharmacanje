@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PharmaCanje Pro | Gestión de Canjes</title>
+    <title>PharmaCanje Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -32,15 +32,14 @@
         .stat-card { background: white; border-radius: 20px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; }
         .stat-card h3 { font-size: 1.6rem; font-weight: 700; color: #1f5068; }
         .stat-card p { font-size: 0.7rem; color: #5b7a92; }
-        .stat-card.active-filter { border: 2px solid #2c7da0; background: #e8f4f8; }
         .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 20px; }
         .card h3 { font-weight: 600; margin-bottom: 14px; border-left: 4px solid #2c7da0; padding-left: 12px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
         th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e9eff4; }
-        th { background: #f8fafc; font-weight: 600; position: sticky; top: 0; }
+        th { background: #f8fafc; font-weight: 600; }
         .btn-primary { background: #2c7da0; color: white; border: none; padding: 5px 14px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; margin-right: 5px; }
         .btn-danger { background: #c0392b; }
-        .badge-junio { background: #27ae60; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; display: inline-block; }
+        .badge-junio { background: #27ae60; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; }
         .filtros { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .filtros input, .filtros select { padding: 6px 12px; border-radius: 25px; border: 1px solid #cbdde6; font-size: 0.7rem; }
         .input-verif { width: 85px; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; border: 1px solid #cbdde6; }
@@ -48,8 +47,6 @@
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         .toast { position: fixed; bottom: 20px; right: 20px; background: #2c7da0; color: white; padding: 10px 18px; border-radius: 30px; z-index: 1000; animation: slideIn 0.3s ease; font-size: 0.8rem; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .loading { text-align: center; padding: 40px; color: white; }
-        .sync-btn { background: #27ae60; margin-left: 10px; }
         @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar span:not(.logo-icon) { display: none; } .main-content { padding: 12px; } }
     </style>
 </head>
@@ -57,10 +54,9 @@
 <div id="root"></div>
 
 <script>
-    
-    const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo6ZluYoz8urGFCNinRJmIGepUZjwc-cHNOyBIIR7AbnqFDzf8EbB3SSgecacw6A/pub?output=csv";
-    
     const BOTICAS = ["UNION", "LIBERTAD POMALCA", "VILLARREAL", "INCAS", "FORTALEZA POMALCA", "LAMBAYEQUE 2", "P.C", "LIBERTAD - LA VICTORIA", "LAMBAYEQUE 3", "LAMBAYEQUE 1"];
+
+const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo6ZluYoz8urGFCNinRJmIGepUZjwc-cHNOyBIIR7AbnqFDzf8EbB3SSgecacw6A/pub?output=csv";
     
     let productos = [];
     let users = [
@@ -99,59 +95,6 @@
         if(currentUser && currentUser.username === usuarioDestino) mostrarToast(`${titulo}: ${mensaje}`);
     }
     
-    // ==================== CARGA DE DATOS DESDE GOOGLE SHEETS ====================
-    async function cargarDatosDesdeGoogleSheets() {
-        if(!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL === "https://docs.google.com/spreadsheets/d/e/2PACX-1vXXXXXX/pub?output=csv") {
-            console.log("No hay URL configurada");
-            return false;
-        }
-        
-        try {
-            mostrarToast("🔄 Cargando datos desde Google Sheets...");
-            const response = await fetch(GOOGLE_SHEETS_URL);
-            const csvText = await response.text();
-            
-            // Convertir CSV a JSON
-            const lines = csvText.split('\n');
-            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-            const nuevosProductos = [];
-            
-            for(let i = 1; i < lines.length; i++) {
-                if(!lines[i].trim()) continue;
-                const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
-                if(values[0] && values[0] !== "LOCAL") {
-                    nuevosProductos.push({
-                        id: "p"+Date.now()+i,
-                        local: values[0] || "UNION",
-                        nombre: values[1] || "Producto",
-                        cantidad: parseInt(values[2]) || 1,
-                        lote: values[3] || "LOTE",
-                        laboratorio: values[4] || "LAB",
-                        canje: values[5] || "PENDIENTE",
-                        proveedor: values[6] || "",
-                        factura: values[7] || "",
-                        fechaVenc: values[8] || "2026-12-31",
-                        obs: values[9] || "",
-                        precio: 0
-                    });
-                }
-            }
-            
-            if(nuevosProductos.length > 0) {
-                productos = nuevosProductos;
-                saveProductos();
-                mostrarToast(`✅ ${nuevosProductos.length} productos cargados desde Google Sheets`);
-                return true;
-            }
-            return false;
-        } catch(error) {
-            console.error("Error al cargar:", error);
-            mostrarToast("❌ Error al cargar datos desde Google Sheets");
-            return false;
-        }
-    }
-    
-    // ==================== IMPORTAR EXCEL LOCAL ====================
     window.importarExcel = function() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -193,10 +136,10 @@
                     if(contador > 0) {
                         productos = nuevosProductos;
                         saveProductos();
-                        mostrarToast(`✅ ${contador} productos importados correctamente!`);
+                        mostrarToast(`✅ ${contador} productos importados!`);
                         renderMainApp();
                     } else {
-                        alert("No se encontraron datos. Asegúrate que la primera fila tenga los encabezados.");
+                        alert("No se encontraron datos. Verifica el formato del archivo.");
                     }
                 } catch(error) {
                     alert("Error al leer el archivo: " + error.message);
@@ -207,11 +150,10 @@
         input.click();
     };
     
-    // ==================== EXPORTAR DATOS ====================
     window.exportarExcel = function() {
-        const wsData = [["LOCAL", "PRODUCTO", "CANTIDAD", "LOTE", "LABORATORIO", "CANJE", "PROVEEDOR", "FACTURA", "FECHA_VENC", "OBSERVACIONES"]];
+        const wsData = [["LOCAL", "PRODUCTO", "CANTIDAD", "LOTE", "LABORATORIO", "CANJE", "PROVEEDOR", "FACTURA"]];
         productos.forEach(p => {
-            wsData.push([p.local, p.nombre, p.cantidad, p.lote, p.laboratorio, p.canje, p.proveedor || "", p.factura || "", p.fechaVenc || "", p.obs || ""]);
+            wsData.push([p.local, p.nombre, p.cantidad, p.lote, p.laboratorio, p.canje, p.proveedor || "", p.factura || ""]);
         });
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
@@ -220,7 +162,6 @@
         mostrarToast("Exportación completada");
     };
     
-    // ==================== LOGIN ====================
     window.doLogin = function() {
         const user = document.getElementById("loginUser").value;
         const pass = document.getElementById("loginPass").value;
@@ -244,16 +185,13 @@
                     <div class="input-group"><label>USUARIO</label><input type="text" id="loginUser" placeholder="Usuario"></div>
                     <div class="input-group"><label>CONTRASEÑA</label><input type="password" id="loginPass" placeholder="••••••"></div>
                     <button class="btn-login" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Ingresar</button>
-                    <div class="demo-creds"><strong>🔐 Credenciales:</strong><br>👑 admin/admin123 | 👩‍💼 supervisor/super123<br>🏪 union/union123 | libertad/lib123</div>
-                    <div class="demo-creds" style="margin-top:8px;"><strong>📌 OPCIONES PARA CARGAR DATOS:</strong><br>
-                    1. Configura Google Sheets (ver Admin Panel)<br>
-                    2. O haz clic en "Importar Excel"</div>
+                    <div class="demo-creds"><strong>🔐 Credenciales:</strong><br>👑 admin/admin123 | 👩‍💼 supervisor/super123<br>🏪 union/union123 | libertad/lib123 | villareal/villa123<br>🏪 incas/incas123 | fortaleza/fort123 | pc/pc123</div>
+                    <div class="demo-creds" style="margin-top:8px; background:#e8f4f8;"><strong>📌 IMPORTANTE:</strong><br>1. Ingresa como ADMIN<br>2. Ve a "Admin Panel"<br>3. Haz clic en "IMPORTAR EXCEL"<br>4. Selecciona tu archivo</div>
                 </div>
             </div>`;
         document.getElementById("loginPass")?.addEventListener("keypress", e => { if(e.key === "Enter") window.doLogin(); });
     }
     
-    // ==================== RENDER PRINCIPAL ====================
     function renderMainApp() {
         if(!currentUser) { renderLogin(); return; }
         const isAdmin = currentUser.rol === "admin";
@@ -280,7 +218,7 @@
         document.getElementById("root").innerHTML = `
             <div class="app-container"><div class="sidebar">${sidebarHtml}</div>
             <div class="main-content"><div class="top-bar">
-                <div><i class="fas fa-store"></i> <strong>${isAdmin ? "ADMINISTRADOR" : (isSupervisor ? "SUPERVISORA" : `BOTICA: ${miBotica}`)}</strong> ${productos.length > 0 ? `<span style="background:#27ae60; padding:2px 10px; border-radius:20px; font-size:11px; margin-left:10px;">📦 ${productos.length} productos</span>` : ''}</div>
+                <div><i class="fas fa-store"></i> <strong>${isAdmin ? "ADMINISTRADOR" : (isSupervisor ? "SUPERVISORA" : `BOTICA: ${miBotica}`)}</strong> ${productos.length > 0 ? `<span style="background:#27ae60; padding:2px 10px; border-radius:20px; font-size:11px; margin-left:10px;">📦 ${productos.length}</span>` : ''}</div>
                 <div><span><i class="fas fa-user"></i> ${currentUser.nombre}</span>
                 <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
             </div><div id="dynamicContent"></div></div></div>`;
@@ -308,7 +246,6 @@
         const totalProductos = productos.length;
         const totalUnidades = productos.reduce((a,b)=>a+(Number(b.cantidad)||0),0);
         const junioUnidades = productos.filter(p=>p.canje==="JUNIO").reduce((a,b)=>a+(Number(b.cantidad)||0),0);
-        const pendientes = productos.filter(p=>p.canje==="PENDIENTE" || p.canje==="MAYO" || p.canje==="ABRIL").length;
         
         const porMes = {};
         productos.forEach(p => { let m = p.canje || "SIN"; porMes[m] = (porMes[m]||0)+(Number(p.cantidad)||0); });
@@ -322,9 +259,9 @@
                 <div class="stat-card"><h3>${totalProductos}</h3><p>Productos</p></div>
                 <div class="stat-card"><h3>${totalUnidades}</h3><p>Unidades</p></div>
                 <div class="stat-card"><h3>${junioUnidades}</h3><p>Canje JUNIO</p></div>
-                <div class="stat-card"><h3>${pendientes}</h3><p>Pendientes</p></div>
+                <div class="stat-card"><h3>${productos.filter(p=>p.canje==="PENDIENTE").length}</h3><p>Pendientes</p></div>
             </div>
-            <div class="card"><h3>📊 Distribución por Mes de Canje</h3><canvas id="mesChart" height="180"></canvas></div>
+            <div class="card"><h3>📊 Distribución por Mes</h3><canvas id="mesChart" height="180"></canvas></div>
             <div class="card"><h3>🏭 Top Laboratorios</h3><canvas id="labChart" height="180"></canvas></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         
@@ -339,8 +276,8 @@
         const miLocal = currentUser.boticaAsignada;
         let productosLocal = productos.filter(p => p.local === miLocal);
         const html = `<div class="card"><h3>📦 Mis Productos - ${miLocal} (${productosLocal.length})</h3>
-            <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
-            <div style="overflow-x:auto; margin-top:12px;"></table><thead><th>Producto</th><th>Cant</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></thead><tbody>
+            <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar</button>
+            <div style="overflow-x:auto; margin-top:12px;"><table><thead><th>Producto</th><th>Cant</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></thead><tbody>
             ${productosLocal.map(p => `<tr>
                 <td>${p.nombre.substring(0,45)}</td
                 <td>${p.cantidad}</td
@@ -356,14 +293,14 @@
     
     function renderVerBoticas() {
         const html = `
-            <div class="card"><h3>🏪 Visualización General de Boticas (${productos.length} productos)</h3>
+            <div class="card"><h3>🏪 Todas las Boticas (${productos.length})</h3>
             <div class="filtros">
-                <select id="filtroLocalVB"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
+                <select id="filtroLocalVB"><option value="TODOS">Todas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
                 <input type="text" id="filtroLabVB" placeholder="Laboratorio...">
-                <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="PENDIENTE">PENDIENTE</option></select>
+                <select id="filtroCanjeVB"><option value="TODOS">Canje</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option></select>
                 <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
             </div>
-            <div style="overflow-x:auto; max-height:450px;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Lote</th><th>Lab</th><th>Canje</th></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
+            <div style="overflow-x:auto;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Lote</th><th>Lab</th><th>Canje</th></thead><tbody id="tablaVBBody"></tbody></tr></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         filtrarVBTabla();
         document.getElementById("filtroLocalVB")?.addEventListener("change", filtrarVBTabla);
@@ -381,48 +318,44 @@
         if(canje !== "TODOS") filtrados = filtrados.filter(p => p.canje === canje);
         
         const tbody = document.getElementById("tablaVBBody");
-        if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
+        if(tbody) tbody.innerHTML = filtrados.slice(0,500).map(p => `<tr>
             <td><strong>${p.local}</strong></td>
-            <td>${p.nombre.substring(0,50)}</td
+            <td>${p.nombre.substring(0,45)}</td
             <td>${p.cantidad}</td
             <td>${p.lote}</td
             <td>${p.laboratorio}</td
             <td>${p.canje}</td
-        </tr>`).join('');
+        </td>`).join('');
     }
     
     function renderMisCanjes() {
         const miLocal = currentUser.boticaAsignada;
         const filtrados = productos.filter(p => p.local === miLocal && p.canje === "JUNIO");
         const html = `<div class="card"><h3>📅 Productos Aprobados para Canje - JUNIO</h3>
-            <div style="overflow-x:auto;"><tr><thead><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></thead><tbody>
+            <div style="overflow-x:auto;"><table><thead><th>Producto</th><th>Cant</th><th>Lab</th><th>Proveedor</th><th>Factura</th></thead><tbody>
             ${filtrados.map(p => `<tr>
                 <td>${p.nombre}</td
                 <td>${p.cantidad}</td
                 <td>${p.laboratorio}</td
                 <td>${p.proveedor || '-'}</td
                 <td>${p.factura || '-'}</td
-            </tr>`).join('') || '<td><td colspan="5">No hay productos aprobados para canje</td</tr>'}
+            </tr>`).join('') || '<tr><td colspan="5">No hay productos</td</tr>'}
             </tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
     function renderPoliticas() {
-        const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "IQ FARMA": "Canje con autorización.", "ELIFARMA": "Coordinar con representante.", "TECNOFARMA": "Canje automático +60 días.", "LANSIER": "Últimos 3 meses.", "default": "Consultar con proveedor." };
-        const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br><span style="font-size:0.75rem;">${pol}</span></div>`).join('')}</div>`;
+        const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "default": "Consultar con proveedor." };
+        const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br>${pol}</div>`).join('')}</div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
     function renderVerificar() {
         if(currentUser.rol !== "admin" && currentUser.rol !== "supervisor") { renderDashboard(); return; }
         const html = `
-            <div class="card"><h3>✅ Verificación de Productos (${productos.length} productos)</h3>
-            <div class="filtros">
-                <input type="text" id="buscarVerif" placeholder="Buscar producto...">
-                <select id="filtroLocalVerif"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
-            </div>
-            <div style="overflow-x:auto; max-height:500px;"><table style="width:100%; min-width:800px;"><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th>Acción</th></thead><tbody id="verifBody"></tbody></table></div>
-            </div>`;
+            <div class="card"><h3>✅ Verificar Productos (${productos.length})</h3>
+            <div class="filtros"><input type="text" id="buscarVerif" placeholder="Buscar..."><select id="filtroLocalVerif"><option value="TODOS">Todas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select></div>
+            <div style="overflow-x:auto;"><table style="min-width:800px;"><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th></th></thead><tbody id="verifBody"></tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         cargarVerificacionTabla();
         document.getElementById("buscarVerif")?.addEventListener("input", cargarVerificacionTabla);
@@ -438,7 +371,7 @@
         const tbody = document.getElementById("verifBody");
         if(tbody) tbody.innerHTML = filtrados.map(p => `
             <tr>
-                <td><strong>${p.local}</strong></td>
+                <td>${p.local}</td
                 <td>${p.nombre.substring(0,35)}</td
                 <td>${p.cantidad}</td
                 <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td
@@ -458,37 +391,26 @@
             prod.factura = document.getElementById(`fact_${id}`).value;
             prod.obs = document.getElementById(`obs_${id}`).value;
             saveProductos();
-            mostrarToast("✅ Producto actualizado");
+            mostrarToast("✅ Guardado");
             cargarVerificacionTabla();
         }
     };
     
     function renderAdminPanel() {
         if(currentUser.rol !== "admin") { renderDashboard(); return; }
-        const html = `<div class="card"><h3>👑 Administración de Datos y Usuarios</h3>
+        const html = `<div class="card"><h3>👑 Administración</h3>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
                 <button class="btn-primary" onclick="importarExcel()"><i class="fas fa-file-upload"></i> Importar Excel</button>
-                <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
-                <button class="btn-primary sync-btn" onclick="cargarDatosDesdeGoogleSheets()"><i class="fas fa-sync-alt"></i> Sincronizar con Google Sheets</button>
+                <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
                 <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> Crear Usuario</button>
             </div>
-            <div style="background:#e8f4f8; padding:15px; border-radius:15px; margin-bottom:20px;">
-                <h4>📌 Configuración de Google Sheets</h4>
-                <p style="font-size:12px; margin-bottom:10px;">Para sincronizar automáticamente tus datos:</p>
-                <ol style="font-size:12px; margin-left:20px;">
-                    <li>Sube tu Excel a Google Sheets</li>
-                    <li>Archivo → Compartir → Publicar en web → CSV</li>
-                    <li>Copia el enlace y pégalo en la variable GOOGLE_SHEETS_URL</li>
-                </ol>
-                <div style="margin-top:10px;"><code style="background:white; padding:8px; display:block; border-radius:10px; font-size:11px;">const GOOGLE_SHEETS_URL = "TU_ENLACE_AQUI";</code></div>
-            </div>
-            <div style="overflow-x:auto;"><h4>👥 Usuarios Registrados</h4><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
+            <h4>👥 Usuarios</h4><div style="overflow-x:auto;"><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th></thead><tbody>
             ${users.map(u => `<tr>
-                <td>${u.username}</td>
-                <td>${u.nombre}</td>
-                <td>${u.rol}</td>
-                <td>${u.boticaAsignada || '-'}</td>
-                <td><button class="btn-danger btn-sm" onclick="eliminarUsuario('${u.id}')">Eliminar</button></td>
+                <td>${u.username}</td
+                <td>${u.nombre}</td
+                <td>${u.rol}</td
+                <td>${u.boticaAsignada || '-'}</td
+                <td><button class="btn-danger btn-sm" onclick="eliminarUsuario('${u.id}')">Eliminar</button></td
             </tr>`).join('')}
             </tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
@@ -497,8 +419,8 @@
     function renderMensajes() {
         const contactos = users.filter(u => u.username !== currentUser.username);
         const html = `<div class="card"><h3>💬 Mensajes</h3>
-            <div class="filtros">${contactos.map(c => `<div class="botica-chip ${chatSeleccionado === c.username ? 'active' : ''}" onclick="seleccionarChat('${c.username}')">${c.nombre}</div>`).join('')}</div>
-            ${chatSeleccionado ? `<div class="chat-container" id="chatContainer"></div><div style="display:flex; gap:6px;"><input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." style="flex:1;"><button class="btn-primary" onclick="enviarMensajeChat()">Enviar</button></div>` : '<p>Selecciona un contacto para chatear</p>'}
+            <div class="filtros">${contactos.map(c => `<div class="botica-chip" onclick="seleccionarChat('${c.username}')">${c.nombre}</div>`).join('')}</div>
+            ${chatSeleccionado ? `<div class="chat-container" id="chatContainer"></div><div style="display:flex;"><input type="text" id="mensajeInput" style="flex:1;"><button class="btn-primary" onclick="enviarMensajeChat()">Enviar</button></div>` : '<p>Selecciona un contacto</p>'}
             </div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         if(chatSeleccionado) cargarChat();
@@ -518,7 +440,7 @@
         if(texto && chatSeleccionado) {
             mensajes.push({ id: Date.now(), de: currentUser.username, para: chatSeleccionado, texto, fecha: new Date().toLocaleString(), leido: false });
             saveMensajes();
-            agregarNotificacion(chatSeleccionado, "Nuevo mensaje", `${currentUser.nombre}: ${texto.substring(0,50)}`);
+            agregarNotificacion(chatSeleccionado, "Nuevo mensaje", texto.substring(0,50));
             document.getElementById("mensajeInput").value = "";
             cargarChat();
         }
@@ -528,26 +450,15 @@
         const misNotif = notificaciones.filter(n => n.usuario === currentUser.username);
         misNotif.forEach(n => n.leido = true);
         saveNotificaciones();
-        const html = `<div class="card"><h3>🔔 Buzón de Notificaciones</h3>
-            <div>${misNotif.length === 0 ? '<p>No hay notificaciones</p>' : misNotif.map(n => `<div class="notificacion-item"><strong>${n.titulo}</strong><br>${n.mensaje}<br><small>${n.fecha}</small></div>`).join('')}</div>
-            <button class="btn-primary" onclick="marcarTodasLeidas()" style="margin-top:10px;">Marcar todas como leídas</button>
-            </div>`;
+        const html = `<div class="card"><h3>🔔 Notificaciones</h3><div>${misNotif.length === 0 ? '<p>No hay notificaciones</p>' : misNotif.map(n => `<div class="notificacion-item"><strong>${n.titulo}</strong><br>${n.mensaje}<br><small>${n.fecha}</small></div>`).join('')}</div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
-    window.marcarTodasLeidas = function() {
-        notificaciones.filter(n => n.usuario === currentUser.username).forEach(n => n.leido = true);
-        saveNotificaciones();
-        renderNotificaciones();
-        mostrarToast("Todas marcadas como leídas");
-    };
-    
     window.agregarProducto = function() {
-        let nombre = prompt("Nombre del producto"); if(!nombre) return;
-        let cantidad = parseInt(prompt("Cantidad")); let venc = prompt("Fecha vencimiento (YYYY-MM-DD)"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
-        productos.push({ id: "p"+Date.now(), nombre, cantidad, precio: 0, fechaVenc: venc, lote, laboratorio: lab, local: currentUser.boticaAsignada, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
+        let nombre = prompt("Nombre producto"); if(!nombre) return;
+        let cantidad = parseInt(prompt("Cantidad")); let venc = prompt("Fecha vencimiento"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
+        productos.push({ id: "p"+Date.now(), nombre, cantidad, precio:0, fechaVenc: venc, lote, laboratorio: lab, local: currentUser.boticaAsignada, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
         saveProductos();
-        mostrarToast("Producto agregado");
         renderMainApp();
     };
     
@@ -556,41 +467,33 @@
         if(p) { p.nombre = prompt("Nuevo nombre", p.nombre) || p.nombre; p.cantidad = parseInt(prompt("Cantidad", p.cantidad)); saveProductos(); renderMainApp(); }
     };
     
-    window.eliminarProducto = (id) => { if(confirm("¿Eliminar producto?")) { productos = productos.filter(p=>p.id!==id); saveProductos(); renderMainApp(); } };
+    window.eliminarProducto = (id) => { if(confirm("¿Eliminar?")) { productos = productos.filter(p=>p.id!==id); saveProductos(); renderMainApp(); } };
     
     window.crearUsuario = () => {
         let username = prompt("Usuario"); if(!username) return;
         let pass = prompt("Contraseña");
-        let rol = prompt("Rol (admin / supervisor / usuario)");
+        let rol = prompt("Rol (admin/supervisor/usuario)");
         if(!["admin","supervisor","usuario"].includes(rol.toLowerCase())) { alert("Rol inválido"); return; }
-        let nombre = prompt("Nombre completo");
+        let nombre = prompt("Nombre");
         let botica = rol.toLowerCase() === "usuario" ? prompt("Botica: " + BOTICAS.join(", ")) : null;
-        if(rol.toLowerCase() === "usuario" && !BOTICAS.includes(botica)) { alert("Botica inválida"); return; }
         users.push({ id: "u"+Date.now(), username, password: pass, rol: rol.toLowerCase(), nombre, boticaAsignada: botica });
         saveUsers();
-        alert("✅ Usuario creado");
         renderMainApp();
     };
     
     window.eliminarUsuario = (id) => { users = users.filter(u=>u.id!==id); saveUsers(); renderMainApp(); };
     
-    // Inicialización
     function init() {
-        initData();
+        const storedUsers = localStorage.getItem("pharma_users");
+        if(storedUsers) users = JSON.parse(storedUsers);
+        else localStorage.setItem("pharma_users", JSON.stringify(users));
+        const storedProductos = localStorage.getItem("pharma_productos");
+        if(storedProductos) productos = JSON.parse(storedProductos);
+        else localStorage.setItem("pharma_productos", JSON.stringify(productos));
+        
         const storedUser = localStorage.getItem("currentUser");
-        if(storedUser) { 
-            currentUser = JSON.parse(storedUser); 
-            renderMainApp();
-            if(productos.length === 0) {
-                setTimeout(() => {
-                    if(confirm("No hay datos cargados. ¿Deseas importar tu archivo Excel ahora?")) {
-                        importarExcel();
-                    }
-                }, 500);
-            }
-        } else { 
-            renderLogin(); 
-        }
+        if(storedUser) { currentUser = JSON.parse(storedUser); renderMainApp(); }
+        else renderLogin();
     }
     
     init();
