@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PharmaCanje Pro | Gestión de Canjes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -17,10 +17,8 @@
         .login-icon i { font-size: 35px; color: white; }
         .login-card h1 { font-size: 26px; color: #1b6b8f; margin-bottom: 8px; }
         .input-group { text-align: left; margin-bottom: 18px; }
-        .input-group label { font-size: 12px; font-weight: 600; color: #5b7a92; margin-bottom: 5px; display: block; }
         .input-group input { width: 100%; padding: 12px 16px; border: 2px solid #e2edf2; border-radius: 28px; font-size: 14px; }
-        .input-group input:focus { outline: none; border-color: #2c7da0; }
-        .btn-login { width: 100%; background: linear-gradient(135deg, #2c7da0, #1b5e7a); color: white; border: none; padding: 12px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 16px; }
+        .btn-login { width: 100%; background: linear-gradient(135deg, #2c7da0, #1b5e7a); color: white; border: none; padding: 12px; border-radius: 30px; font-weight: 600; cursor: pointer; }
         .demo-creds { background: #f0f6fa; border-radius: 20px; padding: 12px; margin-top: 20px; font-size: 11px; text-align: left; }
         .app-container { display: flex; min-height: 100vh; background: #eef2f8; }
         .sidebar { width: 260px; background: linear-gradient(180deg, #0a2b36 0%, #0f3b4a 100%); color: white; padding: 24px 18px; }
@@ -28,68 +26,43 @@
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; margin: 5px 0; border-radius: 14px; cursor: pointer; transition: 0.2s; font-weight: 500; font-size: 0.85rem; }
         .nav-item:hover, .nav-item.active { background: #2c7da0; }
         .main-content { flex: 1; padding: 18px 24px; overflow-x: auto; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 22px; border-radius: 28px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .logout-btn { background: #e74c3c; border: none; padding: 7px 18px; border-radius: 28px; color: white; cursor: pointer; font-size: 0.8rem; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 10px 22px; border-radius: 28px; margin-bottom: 20px; }
+        .logout-btn { background: #e74c3c; border: none; padding: 7px 18px; border-radius: 28px; color: white; cursor: pointer; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 20px; }
-        .stat-card { background: white; border-radius: 20px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .stat-card { background: white; border-radius: 20px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; }
         .stat-card h3 { font-size: 1.6rem; font-weight: 700; color: #1f5068; }
         .stat-card p { font-size: 0.7rem; color: #5b7a92; }
         .stat-card.active-filter { border: 2px solid #2c7da0; background: #e8f4f8; }
-        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .card h3 { font-weight: 600; margin-bottom: 14px; border-left: 4px solid #2c7da0; padding-left: 12px; font-size: 1rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e9eff4; }
+        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 20px; }
+        .card h3 { font-weight: 600; margin-bottom: 14px; border-left: 4px solid #2c7da0; padding-left: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e9eff4; }
         th { background: #f8fafc; font-weight: 600; position: sticky; top: 0; }
         .btn-primary { background: #2c7da0; color: white; border: none; padding: 5px 14px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; margin-right: 5px; }
         .btn-danger { background: #c0392b; }
-        .btn-sm { padding: 4px 10px; font-size: 0.65rem; }
         .badge-junio { background: #27ae60; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; display: inline-block; }
         .filtros { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-        .filtros input, .filtros select { padding: 6px 12px; border-radius: 25px; border: 1px solid #cbdde6; font-size: 0.75rem; }
+        .filtros input, .filtros select { padding: 6px 12px; border-radius: 25px; border: 1px solid #cbdde6; font-size: 0.7rem; }
+        .input-verif { width: 85px; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; border: 1px solid #cbdde6; }
         .notification-badge { background: #e74c3c; color: white; border-radius: 20px; padding: 2px 8px; font-size: 10px; margin-left: 8px; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .chat-container { max-height: 350px; overflow-y: auto; margin-bottom: 14px; border: 1px solid #e2edf2; border-radius: 14px; padding: 12px; background: #f9fafc; }
-        .chat-message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; max-width: 80%; }
-        .chat-message.sent { background: #2c7da0; color: white; margin-left: auto; text-align: right; }
-        .chat-message.received { background: #e9eff4; }
-        .botica-chip { background: #e2edf2; padding: 5px 12px; border-radius: 25px; cursor: pointer; font-size: 0.7rem; display: inline-block; margin: 3px; }
-        .botica-chip.active { background: #2c7da0; color: white; }
-        .notificacion-item { border-bottom: 1px solid #e2edf2; padding: 12px; margin-bottom: 6px; border-radius: 10px; background: #f9fafc; }
         .toast { position: fixed; bottom: 20px; right: 20px; background: #2c7da0; color: white; padding: 10px 18px; border-radius: 30px; z-index: 1000; animation: slideIn 0.3s ease; font-size: 0.8rem; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .input-verif { width: 85px; font-size: 0.7rem; padding: 4px 8px; border-radius: 20px; border: 1px solid #cbdde6; }
-        @media (max-width: 768px) { .sidebar { width: 70px; padding: 16px 8px; } .sidebar span:not(.logo-icon) { display: none; } .main-content { padding: 12px; } }
+        .loading { text-align: center; padding: 40px; color: white; }
+        .sync-btn { background: #27ae60; margin-left: 10px; }
+        @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar span:not(.logo-icon) { display: none; } .main-content { padding: 12px; } }
     </style>
 </head>
 <body>
 <div id="root"></div>
 
 <script>
-    // ==================== BOTICAS ====================
+    
+    const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSo6ZluYoz8urGFCNinRJmIGepUZjwc-cHNOyBIIR7AbnqFDzf8EbB3SSgecacw6A/pub?output=csv";
+    
     const BOTICAS = ["UNION", "LIBERTAD POMALCA", "VILLARREAL", "INCAS", "FORTALEZA POMALCA", "LAMBAYEQUE 2", "P.C", "LIBERTAD - LA VICTORIA", "LAMBAYEQUE 3", "LAMBAYEQUE 1"];
     
-    // ==================== DATOS COMPLETOS (Puedes agregar más productos aquí) ====================
-    let productos = [
-        { id: "p1", nombre: "HEMORRANE POMADA", cantidad: 1, precio: 28.90, fechaVenc: "2026-08-01", lote: "3140", laboratorio: "FAES FARMA", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-638278", obs: "" },
-        { id: "p2", nombre: "amoxicilina", cantidad: 3, precio: 12.00, fechaVenc: "2026-09-12", lote: "00012", laboratorio: "portugal", local: "P.C", canje: "JUNIO", proveedor: "ALFARO", factura: "F001-1214", obs: "" },
-        { id: "p3", nombre: "ibuprofeno", cantidad: 2, precio: 23.00, fechaVenc: "2026-12-12", lote: "123123", laboratorio: "ac farma", local: "P.C", canje: "PENDIENTE", proveedor: "", factura: "", obs: "" },
-        { id: "p4", nombre: "M-VAT INYECTABLE", cantidad: 10, precio: 45.00, fechaVenc: "2026-11-01", lote: "XA3L005", laboratorio: "DROPESAC", local: "FORTALEZA POMALCA", canje: "JUNIO", proveedor: "DROPESAC", factura: "F001-13833", obs: "" },
-        { id: "p5", nombre: "NAYARA GEL", cantidad: 3, precio: 45.50, fechaVenc: "2026-10-01", lote: "314", laboratorio: "ITALFARMACO", local: "LIBERTAD POMALCA", canje: "JUNIO", proveedor: "DIMEXA", factura: "F700-295366", obs: "" },
-        { id: "p6", nombre: "BRIMODIN SOLUCION", cantidad: 2, precio: 32.00, fechaVenc: "2026-09-01", lote: "20900414", laboratorio: "IQ FARMA", local: "UNION", canje: "JUNIO", proveedor: "ALFARO", factura: "FF58-613657", obs: "" },
-        { id: "p7", nombre: "NISOPREX Suspensión", cantidad: 1, precio: 55.00, fechaVenc: "2026-06-01", lote: "2061332", laboratorio: "ELIFARMA", local: "UNION", canje: "JUNIO", proveedor: "QUIMICA", factura: "FF01-2625095", obs: "" },
-        { id: "p8", nombre: "DIMENS MONODOSIS", cantidad: 60, precio: 2.50, fechaVenc: "2026-08-01", lote: "2082233", laboratorio: "FARVET", local: "UNION", canje: "JUNIO", proveedor: "FARVET", factura: "E001-1697", obs: "" },
-        { id: "p9", nombre: "MULTIFLORA ADVANCE", cantidad: 30, precio: 55.00, fechaVenc: "2026-10-01", lote: "137106", laboratorio: "MEGALABS", local: "INCAS", canje: "JUNIO", proveedor: "DIFARLIB", factura: "F002-197057", obs: "" }
-    ];
-    
-    // Agregar productos de ejemplo para todas las boticas que falten
-    BOTICAS.forEach(b => {
-        if(!productos.some(p => p.local === b)) {
-            productos.push({ id: `gen_${b}`, nombre: "Producto Ejemplo", cantidad: 5, precio: 10.00, fechaVenc: "2026-12-01", lote: "L001", laboratorio: "LABGEN", local: b, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
-        }
-    });
-    
-    // ==================== USUARIOS ====================
+    let productos = [];
     let users = [
         { id: "u1", username: "admin", password: "admin123", rol: "admin", nombre: "Administrador", boticaAsignada: null },
         { id: "u2", username: "supervisor", password: "super123", rol: "supervisor", nombre: "Supervisora", boticaAsignada: null },
@@ -112,19 +85,6 @@
     function saveMensajes() { localStorage.setItem("pharma_mensajes", JSON.stringify(mensajes)); }
     function saveNotificaciones() { localStorage.setItem("pharma_notificaciones", JSON.stringify(notificaciones)); }
     
-    function initData() {
-        const storedUsers = localStorage.getItem("pharma_users");
-        if(storedUsers) users = JSON.parse(storedUsers);
-        else localStorage.setItem("pharma_users", JSON.stringify(users));
-        const storedProductos = localStorage.getItem("pharma_productos");
-        if(storedProductos) productos = JSON.parse(storedProductos);
-        else localStorage.setItem("pharma_productos", JSON.stringify(productos));
-        const storedMensajes = localStorage.getItem("pharma_mensajes");
-        mensajes = storedMensajes ? JSON.parse(storedMensajes) : [];
-        const storedNotificaciones = localStorage.getItem("pharma_notificaciones");
-        notificaciones = storedNotificaciones ? JSON.parse(storedNotificaciones) : [];
-    }
-    
     function mostrarToast(mensaje) {
         const toast = document.createElement("div");
         toast.className = "toast";
@@ -138,6 +98,127 @@
         saveNotificaciones();
         if(currentUser && currentUser.username === usuarioDestino) mostrarToast(`${titulo}: ${mensaje}`);
     }
+    
+    // ==================== CARGA DE DATOS DESDE GOOGLE SHEETS ====================
+    async function cargarDatosDesdeGoogleSheets() {
+        if(!GOOGLE_SHEETS_URL || GOOGLE_SHEETS_URL === "https://docs.google.com/spreadsheets/d/e/2PACX-1vXXXXXX/pub?output=csv") {
+            console.log("No hay URL configurada");
+            return false;
+        }
+        
+        try {
+            mostrarToast("🔄 Cargando datos desde Google Sheets...");
+            const response = await fetch(GOOGLE_SHEETS_URL);
+            const csvText = await response.text();
+            
+            // Convertir CSV a JSON
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+            const nuevosProductos = [];
+            
+            for(let i = 1; i < lines.length; i++) {
+                if(!lines[i].trim()) continue;
+                const values = lines[i].split(',').map(v => v.replace(/"/g, '').trim());
+                if(values[0] && values[0] !== "LOCAL") {
+                    nuevosProductos.push({
+                        id: "p"+Date.now()+i,
+                        local: values[0] || "UNION",
+                        nombre: values[1] || "Producto",
+                        cantidad: parseInt(values[2]) || 1,
+                        lote: values[3] || "LOTE",
+                        laboratorio: values[4] || "LAB",
+                        canje: values[5] || "PENDIENTE",
+                        proveedor: values[6] || "",
+                        factura: values[7] || "",
+                        fechaVenc: values[8] || "2026-12-31",
+                        obs: values[9] || "",
+                        precio: 0
+                    });
+                }
+            }
+            
+            if(nuevosProductos.length > 0) {
+                productos = nuevosProductos;
+                saveProductos();
+                mostrarToast(`✅ ${nuevosProductos.length} productos cargados desde Google Sheets`);
+                return true;
+            }
+            return false;
+        } catch(error) {
+            console.error("Error al cargar:", error);
+            mostrarToast("❌ Error al cargar datos desde Google Sheets");
+            return false;
+        }
+    }
+    
+    // ==================== IMPORTAR EXCEL LOCAL ====================
+    window.importarExcel = function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx, .xls, .csv';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                    
+                    const nuevosProductos = [];
+                    let contador = 0;
+                    
+                    for(let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if(row[1] && row[1].toString().trim() !== "" && row[1] !== "DESCRPCION") {
+                            nuevosProductos.push({
+                                id: "p"+Date.now()+i,
+                                nombre: (row[1] || "Producto").toString().substring(0,100),
+                                cantidad: parseInt(row[2]) || 1,
+                                precio: 0,
+                                fechaVenc: row[3] ? new Date(row[3]).toISOString().split('T')[0] : "2026-12-31",
+                                lote: row[4] ? row[4].toString() : "LOTE",
+                                laboratorio: row[5] ? row[5].toString() : "LAB",
+                                local: row[6] ? row[6].toString() : "UNION",
+                                canje: row[7] ? row[7].toString() : "PENDIENTE",
+                                proveedor: row[8] ? row[8].toString() : "",
+                                factura: row[9] ? row[9].toString() : "",
+                                obs: row[10] ? row[10].toString() : ""
+                            });
+                            contador++;
+                        }
+                    }
+                    
+                    if(contador > 0) {
+                        productos = nuevosProductos;
+                        saveProductos();
+                        mostrarToast(`✅ ${contador} productos importados correctamente!`);
+                        renderMainApp();
+                    } else {
+                        alert("No se encontraron datos. Asegúrate que la primera fila tenga los encabezados.");
+                    }
+                } catch(error) {
+                    alert("Error al leer el archivo: " + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+        input.click();
+    };
+    
+    // ==================== EXPORTAR DATOS ====================
+    window.exportarExcel = function() {
+        const wsData = [["LOCAL", "PRODUCTO", "CANTIDAD", "LOTE", "LABORATORIO", "CANJE", "PROVEEDOR", "FACTURA", "FECHA_VENC", "OBSERVACIONES"]];
+        productos.forEach(p => {
+            wsData.push([p.local, p.nombre, p.cantidad, p.lote, p.laboratorio, p.canje, p.proveedor || "", p.factura || "", p.fechaVenc || "", p.obs || ""]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Productos");
+        XLSX.writeFile(wb, `productos_${new Date().toISOString().slice(0,10)}.xlsx`);
+        mostrarToast("Exportación completada");
+    };
     
     // ==================== LOGIN ====================
     window.doLogin = function() {
@@ -163,12 +244,16 @@
                     <div class="input-group"><label>USUARIO</label><input type="text" id="loginUser" placeholder="Usuario"></div>
                     <div class="input-group"><label>CONTRASEÑA</label><input type="password" id="loginPass" placeholder="••••••"></div>
                     <button class="btn-login" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Ingresar</button>
-                    <div class="demo-creds"><strong>🔐 Credenciales:</strong><br>👑 admin/admin123 | 👩‍💼 supervisor/super123<br>🏪 union/union123 | libertad/lib123 | villareal/villa123<br>🏪 incas/incas123 | fortaleza/fort123 | pc/pc123</div>
+                    <div class="demo-creds"><strong>🔐 Credenciales:</strong><br>👑 admin/admin123 | 👩‍💼 supervisor/super123<br>🏪 union/union123 | libertad/lib123</div>
+                    <div class="demo-creds" style="margin-top:8px;"><strong>📌 OPCIONES PARA CARGAR DATOS:</strong><br>
+                    1. Configura Google Sheets (ver Admin Panel)<br>
+                    2. O haz clic en "Importar Excel"</div>
                 </div>
             </div>`;
         document.getElementById("loginPass")?.addEventListener("keypress", e => { if(e.key === "Enter") window.doLogin(); });
     }
     
+    // ==================== RENDER PRINCIPAL ====================
     function renderMainApp() {
         if(!currentUser) { renderLogin(); return; }
         const isAdmin = currentUser.rol === "admin";
@@ -195,7 +280,7 @@
         document.getElementById("root").innerHTML = `
             <div class="app-container"><div class="sidebar">${sidebarHtml}</div>
             <div class="main-content"><div class="top-bar">
-                <div><i class="fas fa-store"></i> <strong>${isAdmin ? "ADMINISTRADOR" : (isSupervisor ? "SUPERVISORA" : `BOTICA: ${miBotica}`)}</strong></div>
+                <div><i class="fas fa-store"></i> <strong>${isAdmin ? "ADMINISTRADOR" : (isSupervisor ? "SUPERVISORA" : `BOTICA: ${miBotica}`)}</strong> ${productos.length > 0 ? `<span style="background:#27ae60; padding:2px 10px; border-radius:20px; font-size:11px; margin-left:10px;">📦 ${productos.length} productos</span>` : ''}</div>
                 <div><span><i class="fas fa-user"></i> ${currentUser.nombre}</span>
                 <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
             </div><div id="dynamicContent"></div></div></div>`;
@@ -220,47 +305,45 @@
     }
     
     function renderDashboard() {
-        const porBotica = {};
-        const porCanje = {};
-        productos.forEach(p => {
-            porBotica[p.local] = (porBotica[p.local] || 0) + (Number(p.cantidad) || 0);
-            porCanje[p.canje] = (porCanje[p.canje] || 0) + (Number(p.cantidad) || 0);
-        });
+        const totalProductos = productos.length;
+        const totalUnidades = productos.reduce((a,b)=>a+(Number(b.cantidad)||0),0);
+        const junioUnidades = productos.filter(p=>p.canje==="JUNIO").reduce((a,b)=>a+(Number(b.cantidad)||0),0);
+        const pendientes = productos.filter(p=>p.canje==="PENDIENTE" || p.canje==="MAYO" || p.canje==="ABRIL").length;
+        
+        const porMes = {};
+        productos.forEach(p => { let m = p.canje || "SIN"; porMes[m] = (porMes[m]||0)+(Number(p.cantidad)||0); });
+        
+        const topLab = {};
+        productos.forEach(p => { topLab[p.laboratorio] = (topLab[p.laboratorio]||0)+(Number(p.cantidad)||0); });
+        const topLabArray = Object.entries(topLab).sort((a,b)=>b[1]-a[1]).slice(0,6);
         
         const html = `
             <div class="stats-grid">
-                ${BOTICAS.slice(0,8).map(b => `<div class="stat-card ${dashboardFiltroBotica === b ? 'active-filter' : ''}" onclick="setDashboardFiltro('${b}')"><h3>${porBotica[b] || 0}</h3><p>${b.substring(0,12)}</p></div>`).join('')}
-                <div class="stat-card ${dashboardFiltroBotica === 'TODOS' ? 'active-filter' : ''}" onclick="setDashboardFiltro('TODOS')"><h3>${productos.reduce((a,b)=>a+(Number(b.cantidad)||0),0)}</h3><p>TODAS</p></div>
+                <div class="stat-card"><h3>${totalProductos}</h3><p>Productos</p></div>
+                <div class="stat-card"><h3>${totalUnidades}</h3><p>Unidades</p></div>
+                <div class="stat-card"><h3>${junioUnidades}</h3><p>Canje JUNIO</p></div>
+                <div class="stat-card"><h3>${pendientes}</h3><p>Pendientes</p></div>
             </div>
             <div class="card"><h3>📊 Distribución por Mes de Canje</h3><canvas id="mesChart" height="180"></canvas></div>
             <div class="card"><h3>🏭 Top Laboratorios</h3><canvas id="labChart" height="180"></canvas></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         
-        let filtrados = dashboardFiltroBotica === "TODOS" ? productos : productos.filter(p => p.local === dashboardFiltroBotica);
-        const porMes = {};
-        filtrados.forEach(p => { let m = p.canje || "SIN"; porMes[m] = (porMes[m]||0)+(Number(p.cantidad)||0); });
         const ctxMes = document.getElementById("mesChart")?.getContext("2d");
         if(ctxMes) new Chart(ctxMes, { type:'bar', data:{ labels:Object.keys(porMes), datasets:[{ label:'Unidades', data:Object.values(porMes), backgroundColor:'#2c7da0', borderRadius:6 }] }, options:{ responsive: true, maintainAspectRatio: true } });
         
-        const topLab = {};
-        filtrados.forEach(p => { topLab[p.laboratorio] = (topLab[p.laboratorio]||0)+(Number(p.cantidad)||0); });
-        const topLabArray = Object.entries(topLab).sort((a,b)=>b[1]-a[1]).slice(0,6);
         const ctxLab = document.getElementById("labChart")?.getContext("2d");
         if(ctxLab) new Chart(ctxLab, { type:'bar', data:{ labels:topLabArray.map(l=>l[0]), datasets:[{ label:'Unidades', data:topLabArray.map(l=>l[1]), backgroundColor:'#61a5c2', borderRadius:6 }] }, options:{ responsive: true, maintainAspectRatio: true } });
     }
     
-    window.setDashboardFiltro = function(botica) { dashboardFiltroBotica = botica; renderDashboard(); };
-    
     function renderMisProductos() {
         const miLocal = currentUser.boticaAsignada;
         let productosLocal = productos.filter(p => p.local === miLocal);
-        const html = `<div class="card"><h3>📦 Mis Productos - ${miLocal}</h3>
+        const html = `<div class="card"><h3>📦 Mis Productos - ${miLocal} (${productosLocal.length})</h3>
             <button class="btn-primary" onclick="agregarProducto()"><i class="fas fa-plus"></i> Agregar Producto</button>
-            <div style="overflow-x:auto; margin-top:12px;"><table><thead><tr><th>Producto</th><th>Cant</th><th>Precio</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></tr></thead><tbody>
+            <div style="overflow-x:auto; margin-top:12px;"></table><thead><th>Producto</th><th>Cant</th><th>Vence</th><th>Lote</th><th>Lab</th><th>Canje</th><th>Acciones</th></thead><tbody>
             ${productosLocal.map(p => `<tr>
-                <td>${p.nombre.substring(0,40)}</td
+                <td>${p.nombre.substring(0,45)}</td
                 <td>${p.cantidad}</td
-                <td>S/ ${(p.precio||0).toFixed(2)}</td
                 <td>${p.fechaVenc}</td
                 <td>${p.lote}</td
                 <td>${p.laboratorio}</td
@@ -273,14 +356,14 @@
     
     function renderVerBoticas() {
         const html = `
-            <div class="card"><h3>🏪 Visualización General de Boticas</h3>
+            <div class="card"><h3>🏪 Visualización General de Boticas (${productos.length} productos)</h3>
             <div class="filtros">
                 <select id="filtroLocalVB"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
                 <input type="text" id="filtroLabVB" placeholder="Laboratorio...">
-                <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="BONIFICACION">BONIFICACION</option></select>
+                <select id="filtroCanjeVB"><option value="TODOS">Todos los canjes</option><option value="JUNIO">JUNIO</option><option value="JULIO">JULIO</option><option value="PENDIENTE">PENDIENTE</option></select>
                 <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar</button>
             </div>
-            <div style="overflow-x:auto; max-height:450px;"><table><thead><tr><th>Local</th><th>Producto</th><th>Cant</th><th>Precio</th><th>Laboratorio</th><th>Canje</th></table></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
+            <div style="overflow-x:auto; max-height:450px;"><table><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Lote</th><th>Lab</th><th>Canje</th></thead><tbody id="tablaVBBody"></tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         filtrarVBTabla();
         document.getElementById("filtroLocalVB")?.addEventListener("change", filtrarVBTabla);
@@ -300,9 +383,9 @@
         const tbody = document.getElementById("tablaVBBody");
         if(tbody) tbody.innerHTML = filtrados.map(p => `<tr>
             <td><strong>${p.local}</strong></td>
-            <td>${p.nombre.substring(0,45)}</td
+            <td>${p.nombre.substring(0,50)}</td
             <td>${p.cantidad}</td
-            <td>S/ ${(p.precio||0).toFixed(2)}</td
+            <td>${p.lote}</td
             <td>${p.laboratorio}</td
             <td>${p.canje}</td
         </tr>`).join('');
@@ -310,67 +393,35 @@
     
     function renderMisCanjes() {
         const miLocal = currentUser.boticaAsignada;
-        const meses = ["JUNIO", "JULIO", "AGOSTO", "PENDIENTE"];
-        const html = `
-            <div class="card"><h3>📅 Productos en Canje - ${miLocal}</h3>
-            <div class="filtros">${meses.map(m => `<button class="btn-primary" onclick="filtrarCanjesPorMes('${m}')">${m}</button>`).join('')}</div>
-            <div id="tablaCanjesMes"></div></div>`;
-        document.getElementById("dynamicContent").innerHTML = html;
-        filtrarCanjesPorMes("JUNIO");
-    }
-    
-    window.filtrarCanjesPorMes = function(mes) {
-        const miLocal = currentUser.boticaAsignada;
-        const filtrados = productos.filter(p => p.local === miLocal && p.canje === mes);
-        const html = `<table><thead><tr><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></tr></thead><tbody>
+        const filtrados = productos.filter(p => p.local === miLocal && p.canje === "JUNIO");
+        const html = `<div class="card"><h3>📅 Productos Aprobados para Canje - JUNIO</h3>
+            <div style="overflow-x:auto;"><tr><thead><th>Producto</th><th>Cantidad</th><th>Laboratorio</th><th>Proveedor</th><th>Factura</th></thead><tbody>
             ${filtrados.map(p => `<tr>
                 <td>${p.nombre}</td
                 <td>${p.cantidad}</td
                 <td>${p.laboratorio}</td
                 <td>${p.proveedor || '-'}</td
                 <td>${p.factura || '-'}</td
-            </tr>`).join('') || '<tr><td colspan="5">No hay productos para este mes</td</tr>'}
-        </tbody></table>`;
-        document.getElementById("tablaCanjesMes").innerHTML = html;
-    };
+            </tr>`).join('') || '<td><td colspan="5">No hay productos aprobados para canje</td</tr>'}
+            </tbody></table></div></div>`;
+        document.getElementById("dynamicContent").innerHTML = html;
+    }
     
     function renderPoliticas() {
-        const politicas = { 
-            "ITALFARMACO": "Canje hasta 60 días antes del vencimiento.", 
-            "FAES FARMA": "Canje con 90 días de anticipación.", 
-            "MEGALABS": "45 días antes del vencimiento.", 
-            "IQ FARMA": "Canje exclusivo con autorización previa.", 
-            "ELIFARMA": "Coordinar con el representante.", 
-            "TECNOFARMA": "Canje automático +60 días.", 
-            "LANSIER": "Solo productos últimos 3 meses.", 
-            "BAYER": "Máximo 30 días antes del vencimiento.",
-            "default": "Consultar con el proveedor." 
-        };
+        const politicas = { "ITALFARMACO": "Canje hasta 60 días antes.", "FAES FARMA": "Canje con 90 días.", "MEGALABS": "45 días antes.", "IQ FARMA": "Canje con autorización.", "ELIFARMA": "Coordinar con representante.", "TECNOFARMA": "Canje automático +60 días.", "LANSIER": "Últimos 3 meses.", "default": "Consultar con proveedor." };
         const html = `<div class="card"><h3>📋 Políticas de Canje</h3>${Object.entries(politicas).map(([lab, pol]) => `<div style="padding:8px; border-bottom:1px solid #e2edf2;"><strong>${lab}</strong><br><span style="font-size:0.75rem;">${pol}</span></div>`).join('')}</div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
     
-    // ==================== VERIFICACIÓN CORREGIDA ====================
     function renderVerificar() {
         if(currentUser.rol !== "admin" && currentUser.rol !== "supervisor") { renderDashboard(); return; }
-        
         const html = `
-            <div class="card"><h3>✅ Verificación de Productos</h3>
+            <div class="card"><h3>✅ Verificación de Productos (${productos.length} productos)</h3>
             <div class="filtros">
                 <input type="text" id="buscarVerif" placeholder="Buscar producto...">
                 <select id="filtroLocalVerif"><option value="TODOS">Todas las boticas</option>${BOTICAS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select>
             </div>
-            <div style="overflow-x:auto; max-height:500px;">
-                <table style="width:100%; min-width:800px;">
-                    <thead>
-                        <tr><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th>Acción</th></tr>
-                    </thead>
-                    <tbody id="verifBody"></tbody>
-                </table>
-            </div>
-            <div style="margin-top:15px; text-align:right;">
-                <button class="btn-primary" onclick="exportarVerificacion()"><i class="fas fa-file-excel"></i> Exportar verificación</button>
-            </div>
+            <div style="overflow-x:auto; max-height:500px;"><table style="width:100%; min-width:800px;"><thead><th>Local</th><th>Producto</th><th>Cant</th><th>Canje</th><th>Proveedor</th><th>Factura</th><th>Obs</th><th>Acción</th></thead><tbody id="verifBody"></tbody></table></div>
             </div>`;
         document.getElementById("dynamicContent").innerHTML = html;
         cargarVerificacionTabla();
@@ -385,20 +436,18 @@
         if(localFiltro !== "TODOS") filtrados = filtrados.filter(p => p.local === localFiltro);
         
         const tbody = document.getElementById("verifBody");
-        if(tbody) {
-            tbody.innerHTML = filtrados.map(p => `
-                <tr>
-                    <td><strong>${p.local}</strong></td>
-                    <td>${p.nombre.substring(0,35)}</td>
-                    <td>${p.cantidad}</td>
-                    <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td>
-                    <td><input type="text" id="prov_${p.id}" value="${p.proveedor||''}" class="input-verif"></td>
-                    <td><input type="text" id="fact_${p.id}" value="${p.factura||''}" class="input-verif"></td>
-                    <td><input type="text" id="obs_${p.id}" value="${p.obs||''}" class="input-verif"></td>
-                    <td><button class="btn-primary btn-sm" onclick="guardarVerificacion('${p.id}')">Guardar</button></td>
-                </tr>
-            `).join('');
-        }
+        if(tbody) tbody.innerHTML = filtrados.map(p => `
+            <tr>
+                <td><strong>${p.local}</strong></td>
+                <td>${p.nombre.substring(0,35)}</td
+                <td>${p.cantidad}</td
+                <td><input type="text" id="canje_${p.id}" value="${p.canje}" class="input-verif"></td
+                <td><input type="text" id="prov_${p.id}" value="${p.proveedor||''}" class="input-verif"></td
+                <td><input type="text" id="fact_${p.id}" value="${p.factura||''}" class="input-verif"></td
+                <td><input type="text" id="obs_${p.id}" value="${p.obs||''}" class="input-verif"></td
+                <td><button class="btn-primary btn-sm" onclick="guardarVerificacion('${p.id}')">Guardar</button></td
+            </tr>
+        `).join('');
     }
     
     window.guardarVerificacion = (id) => {
@@ -414,22 +463,26 @@
         }
     };
     
-    window.exportarVerificacion = function() {
-        const wsData = [["Local", "Producto", "Cantidad", "Precio", "Laboratorio", "Canje", "Lote", "Proveedor", "Factura", "Observaciones"]];
-        productos.forEach(p => { wsData.push([p.local, p.nombre, p.cantidad, p.precio, p.laboratorio, p.canje, p.lote, p.proveedor || "", p.factura || "", p.obs || ""]); });
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Verificacion");
-        XLSX.writeFile(wb, `verificacion_${new Date().toISOString().slice(0,10)}.xlsx`);
-        mostrarToast("Exportación completada");
-    };
-    
     function renderAdminPanel() {
         if(currentUser.rol !== "admin") { renderDashboard(); return; }
-        const html = `<div class="card"><h3>👑 Administración de Usuarios</h3>
-            <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> Crear Usuario</button>
-            <button class="btn-primary" onclick="importarExcel()"><i class="fas fa-file-upload"></i> Importar Excel</button>
-            <div style="overflow-x:auto; margin-top:12px;"><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
+        const html = `<div class="card"><h3>👑 Administración de Datos y Usuarios</h3>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+                <button class="btn-primary" onclick="importarExcel()"><i class="fas fa-file-upload"></i> Importar Excel</button>
+                <button class="btn-primary" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
+                <button class="btn-primary sync-btn" onclick="cargarDatosDesdeGoogleSheets()"><i class="fas fa-sync-alt"></i> Sincronizar con Google Sheets</button>
+                <button class="btn-primary" onclick="crearUsuario()"><i class="fas fa-user-plus"></i> Crear Usuario</button>
+            </div>
+            <div style="background:#e8f4f8; padding:15px; border-radius:15px; margin-bottom:20px;">
+                <h4>📌 Configuración de Google Sheets</h4>
+                <p style="font-size:12px; margin-bottom:10px;">Para sincronizar automáticamente tus datos:</p>
+                <ol style="font-size:12px; margin-left:20px;">
+                    <li>Sube tu Excel a Google Sheets</li>
+                    <li>Archivo → Compartir → Publicar en web → CSV</li>
+                    <li>Copia el enlace y pégalo en la variable GOOGLE_SHEETS_URL</li>
+                </ol>
+                <div style="margin-top:10px;"><code style="background:white; padding:8px; display:block; border-radius:10px; font-size:11px;">const GOOGLE_SHEETS_URL = "TU_ENLACE_AQUI";</code></div>
+            </div>
+            <div style="overflow-x:auto;"><h4>👥 Usuarios Registrados</h4><table><thead><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Botica</th><th>Acciones</th></thead><tbody>
             ${users.map(u => `<tr>
                 <td>${u.username}</td>
                 <td>${u.nombre}</td>
@@ -440,48 +493,6 @@
             </tbody></table></div></div>`;
         document.getElementById("dynamicContent").innerHTML = html;
     }
-    
-    // ==================== IMPORTAR EXCEL ====================
-    window.importarExcel = function() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.xlsx, .xls, .csv';
-        input.onchange = function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                
-                for(let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if(row[0] && row[1]) {
-                        productos.push({
-                            id: "p"+Date.now()+i,
-                            nombre: row[1] || "Producto",
-                            cantidad: parseInt(row[2]) || 1,
-                            precio: parseFloat(row[3]) || 0,
-                            fechaVenc: row[4] || "2026-12-31",
-                            lote: row[5] || "LOTE",
-                            laboratorio: row[6] || "LAB",
-                            local: row[7] || "UNION",
-                            canje: row[8] || "PENDIENTE",
-                            proveedor: row[9] || "",
-                            factura: row[10] || "",
-                            obs: row[11] || ""
-                        });
-                    }
-                }
-                saveProductos();
-                mostrarToast(`Importados ${rows.length-1} productos`);
-                renderMainApp();
-            };
-            reader.readAsArrayBuffer(file);
-        };
-        input.click();
-    };
     
     function renderMensajes() {
         const contactos = users.filter(u => u.username !== currentUser.username);
@@ -533,9 +544,8 @@
     
     window.agregarProducto = function() {
         let nombre = prompt("Nombre del producto"); if(!nombre) return;
-        let cantidad = parseInt(prompt("Cantidad")); let precio = parseFloat(prompt("Precio S/")) || 0;
-        let venc = prompt("Fecha vencimiento (YYYY-MM-DD)"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
-        productos.push({ id: "p"+Date.now(), nombre, cantidad, precio, fechaVenc: venc, lote, laboratorio: lab, local: currentUser.boticaAsignada, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
+        let cantidad = parseInt(prompt("Cantidad")); let venc = prompt("Fecha vencimiento (YYYY-MM-DD)"); let lote = prompt("Lote"); let lab = prompt("Laboratorio");
+        productos.push({ id: "p"+Date.now(), nombre, cantidad, precio: 0, fechaVenc: venc, lote, laboratorio: lab, local: currentUser.boticaAsignada, canje: "PENDIENTE", proveedor: "", factura: "", obs: "" });
         saveProductos();
         mostrarToast("Producto agregado");
         renderMainApp();
@@ -543,7 +553,7 @@
     
     window.editarProducto = (id) => {
         let p = productos.find(p=>p.id===id);
-        if(p) { p.nombre = prompt("Nuevo nombre", p.nombre) || p.nombre; p.cantidad = parseInt(prompt("Cantidad", p.cantidad)); p.precio = parseFloat(prompt("Precio", p.precio)); saveProductos(); renderMainApp(); }
+        if(p) { p.nombre = prompt("Nuevo nombre", p.nombre) || p.nombre; p.cantidad = parseInt(prompt("Cantidad", p.cantidad)); saveProductos(); renderMainApp(); }
     };
     
     window.eliminarProducto = (id) => { if(confirm("¿Eliminar producto?")) { productos = productos.filter(p=>p.id!==id); saveProductos(); renderMainApp(); } };
@@ -564,20 +574,26 @@
     
     window.eliminarUsuario = (id) => { users = users.filter(u=>u.id!==id); saveUsers(); renderMainApp(); };
     
-    window.exportarExcel = function() {
-        const wsData = [["Local", "Producto", "Cantidad", "Precio", "Laboratorio", "Canje", "Lote", "Proveedor", "Factura"]];
-        productos.forEach(p => { wsData.push([p.local, p.nombre, p.cantidad, p.precio, p.laboratorio, p.canje, p.lote, p.proveedor || "", p.factura || ""]); });
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Canjes");
-        XLSX.writeFile(wb, `canjes_${new Date().toISOString().slice(0,10)}.xlsx`);
-        mostrarToast("Exportación completada");
-    };
+    // Inicialización
+    function init() {
+        initData();
+        const storedUser = localStorage.getItem("currentUser");
+        if(storedUser) { 
+            currentUser = JSON.parse(storedUser); 
+            renderMainApp();
+            if(productos.length === 0) {
+                setTimeout(() => {
+                    if(confirm("No hay datos cargados. ¿Deseas importar tu archivo Excel ahora?")) {
+                        importarExcel();
+                    }
+                }, 500);
+            }
+        } else { 
+            renderLogin(); 
+        }
+    }
     
-    initData();
-    const storedUser = localStorage.getItem("currentUser");
-    if(storedUser) { currentUser = JSON.parse(storedUser); renderMainApp(); }
-    else renderLogin();
+    init();
 </script>
 </body>
 </html>
